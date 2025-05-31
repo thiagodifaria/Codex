@@ -15,16 +15,13 @@ A aplicação se destaca por sua abordagem holística à produtividade, combinan
 ## 📸 Screenshots
 
 ### Dashboard Personalizado
-*[Futura screenshot do dashboard com resumo diário]*
-
-### Editor Rico Integrado
-*[Futura screenshot do editor Tiptap em ação]*
+*[Futura screenshot]*
 
 ### Gerenciamento de Projetos
-*[Futura screenshot da interface de projetos]*
+*[Futura screenshot]*
 
 ### Sistema de Metas e Hábitos
-*[Futura screenshot do tracking de progresso]*
+*[Futura screenshot]*
 
 ## ✨ Principais Funcionalidades
 
