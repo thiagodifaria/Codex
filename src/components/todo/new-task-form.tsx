@@ -33,6 +33,7 @@ export function NewTaskForm({ onAddTask, isOpen, onToggle, formTitle }: NewTaskF
   const [dueDate, setDueDate] = useState<Date | undefined>();
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [status, setStatus] = useState<TaskStatus>('todo');
+  const [tagsString, setTagsString] = useState("");
 
   const defaultFormTitle = t('todo_new_task_form_title_global');
 
@@ -43,12 +44,14 @@ export function NewTaskForm({ onAddTask, isOpen, onToggle, formTitle }: NewTaskF
       alert(t('common_required_field'));
       return;
     }
+    const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag !== "");
     onAddTask({
       title,
       description,
       dueDate: dueDate?.toISOString(),
       priority,
       status,
+      tags,
     });
     // Reset form
     setTitle("");
@@ -56,6 +59,7 @@ export function NewTaskForm({ onAddTask, isOpen, onToggle, formTitle }: NewTaskF
     setDueDate(undefined);
     setPriority('medium');
     setStatus('todo');
+    setTagsString("");
     onToggle(); 
   };
 
@@ -87,6 +91,16 @@ export function NewTaskForm({ onAddTask, isOpen, onToggle, formTitle }: NewTaskF
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('todo_task_description_placeholder')}
               rows={3}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="taskTags">{t('common_tags')} {t('common_optional_suffix')}</Label>
+            <Input
+              id="taskTags"
+              value={tagsString}
+              onChange={(e) => setTagsString(e.target.value)}
+              placeholder={t('common_tags_placeholder')}
             />
           </div>
           
@@ -150,5 +164,3 @@ export function NewTaskForm({ onAddTask, isOpen, onToggle, formTitle }: NewTaskF
     </Collapsible.Root>
   );
 }
-
-    

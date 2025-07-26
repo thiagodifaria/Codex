@@ -4,9 +4,11 @@
 import type { JournalEntry } from "@/types/codex";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { format, parseISO, isValid } from 'date-fns';
 import { useTranslation } from "react-i18next";
 import React from 'react';
+import { Tag } from "lucide-react";
 
 interface EntryCardProps {
   entry: JournalEntry;
@@ -24,6 +26,15 @@ export const EntryCard = React.memo(function EntryCard({ entry, onEdit, onDelete
       </CardHeader>
       <CardContent>
         <p className="text-sm line-clamp-3">{entry.content.replace(/<[^>]+>/g, '').substring(0, 150) + (entry.content.replace(/<[^>]+>/g, '').length > 150 ? "..." : "")}</p>
+        {entry.tags && entry.tags.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {entry.tags.map(tag => (
+              <Badge key={tag} variant="secondary" className="text-xs">
+                <Tag className="h-3 w-3 mr-1"/>{tag}
+              </Badge>
+            ))}
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
         <Button variant="outline" size="sm" onClick={() => onEdit(entry)}>{t('common_edit')}</Button>
@@ -34,4 +45,3 @@ export const EntryCard = React.memo(function EntryCard({ entry, onEdit, onDelete
 });
 
 EntryCard.displayName = 'EntryCard';
-    

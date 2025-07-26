@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { format, isValid, parseISO } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 
-const getDummyGoals = (t: Function): Goal[] => [
+export const getDummyGoals = (t: Function): Goal[] => [
   { id: '1', titleKey: "goals_dummy_goal1_title", descriptionKey: "goals_dummy_goal1_desc", targetDate: new Date(2024, 11, 31).toISOString(), progress: 0, subGoals: [
     {id: 'sg1', titleKey: "goals_dummy_goal1_sg1", completed: false},
     {id: 'sg2', titleKey: "goals_dummy_goal1_sg2", completed: false},
@@ -35,7 +35,7 @@ const getDummyHabits = (t: Function): Habit[] => [
   { id: 'h4', nameKey: "goals_dummy_habit4_name", frequency: 'weekly' },
 ];
 
-const calculateProgress = (subGoals?: SubGoal[]): number => {
+export const calculateProgress = (subGoals?: SubGoal[]): number => {
   if (!subGoals || subGoals.length === 0) {
     return 0; 
   }
@@ -184,7 +184,7 @@ export default function GoalsPage() {
 
   return (
     <PageWrapper title={t('page_title_goals')}>
-      <div className="flex justify-end gap-4 mb-6">
+      <div className="flex flex-wrap justify-end gap-2 mb-6">
         <Button onClick={openNewGoalModal} data-testid="add-new-goal-btn">
           <PlusCircle className="mr-2 h-5 w-5" /> {t('goal_add_new_goal_button')}
         </Button>
@@ -310,4 +310,5 @@ export default function GoalsPage() {
     </PageWrapper>
   );
 }
+    
     

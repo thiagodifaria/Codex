@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import PageWrapper from "@/components/layout/page-wrapper";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Button } from '@/components/ui/button';
 import type { Project, Task, Milestone, ResourceLink, ProjectStatus, TaskStatus, TaskPriority } from '@/types/codex';
 import { Checkbox } from '@/components/ui/checkbox';
-import { PlusCircle, LinkIcon, Flag, ListTodo, Info, Trash2, Edit2, FileText, CalendarDays } from 'lucide-react';
+import { PlusCircle, LinkIcon, Flag, ListTodo, Info, Trash2, Edit2, FileText, CalendarDays, GripVertical, Edit3, Star, Tag as TagIcon } from 'lucide-react'; 
 import LoadingAnimation from '@/components/shared/loading-animation';
 import { TiptapEditor } from '@/components/shared/tiptap-editor';
 import { NewTaskForm } from '@/components/todo/new-task-form';
@@ -18,10 +18,16 @@ import TaskCompletionAnimation from '@/components/shared/task-completion-animati
 import { format, parseISO, isValid } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from "@/components/ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 
 
 const projectStatusColors: Record<ProjectStatus, string> = {
@@ -31,6 +37,7 @@ const projectStatusColors: Record<ProjectStatus, string> = {
   completed: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
   archived: "bg-gray-100 text-gray-700 dark:bg-gray-700/30 dark:text-gray-300",
 };
+const projectStatusOptions: ProjectStatus[] = ['planning', 'active', 'on-hold', 'completed', 'archived'];
 
 
 const getDummyProjectsData = (t: Function): Project[] => [
@@ -39,6 +46,7 @@ const getDummyProjectsData = (t: Function): Project[] => [
     descriptionKey: "projects_dummy_proj1_desc", 
     status: 'active', focus: true, 
     startDate: new Date(2024, 5, 1).toISOString(), endDate: new Date(2024, 11, 31).toISOString(),
+    tags: ["dev", "productivity", "saas"],
     milestones: [
       { id: 'm1', titleKey: "projects_dummy_proj1_milestone1_title", dueDate: "2024-09-01", completed: false },
       { id: 'm2', titleKey: "projects_dummy_proj1_milestone2_title", dueDate: "2024-10-15", completed: false },
@@ -53,21 +61,24 @@ const getDummyProjectsData = (t: Function): Project[] => [
     descriptionKey: "projects_dummy_proj2_desc", 
     status: 'planning', focus: false, 
     startDate: new Date(2024, 8, 1).toISOString(), 
+    tags: ["web", "portfolio"],
     milestones: [], resources: [] 
   },
 ];
 
 const getDummyTasksData = (t: Function): { [projectId: string]: Task[] } => ({
   'codex-app': [
-    { id: 't1', projectId: 'codex-app', titleKey: "projects_task_proj1_task1_title", completed: true, status: 'done', priority: 'high', descriptionKey: "projects_task_proj1_task1_desc" },
-    { id: 't2', projectId: 'codex-app', titleKey: "projects_task_proj1_task2_title", completed: false, status: 'in-progress', dueDate: "2024-08-10", priority: 'high', descriptionKey: "projects_task_proj1_task2_desc" },
-    { id: 't3', projectId: 'codex-app', titleKey: "projects_task_proj1_task3_title", completed: false, status: 'todo', priority: 'medium', descriptionKey: "projects_task_proj1_task3_desc" },
+    { id: 't1', projectId: 'codex-app', titleKey: "projects_task_proj1_task1_title", completed: true, status: 'done', priority: 'high', descriptionKey: "projects_task_proj1_task1_desc", tags: ["setup", "config"] },
+    { id: 't2', projectId: 'codex-app', titleKey: "projects_task_proj1_task2_title", completed: false, status: 'in-progress', dueDate: "2024-08-10", priority: 'high', descriptionKey: "projects_task_proj1_task2_desc", tags: ["backend", "database"] },
+    { id: 't3', projectId: 'codex-app', titleKey: "projects_task_proj1_task3_title", completed: false, status: 'todo', priority: 'medium', descriptionKey: "projects_task_proj1_task3_desc", tags: ["auth", "security"] },
   ],
   'personal-website': [
-    { id: 't4', projectId: 'personal-website', titleKey: "projects_task_proj2_task1_title", completed: true, status: 'done', priority: 'medium', descriptionKey: "projects_task_proj2_task1_desc" },
-    { id: 't5', projectId: 'personal-website', titleKey: "projects_task_proj2_task2_title", completed: false, status: 'todo', priority: 'low', descriptionKey: "projects_task_proj2_task2_desc" },
+    { id: 't4', projectId: 'personal-website', titleKey: "projects_task_proj2_task1_title", completed: true, status: 'done', priority: 'medium', descriptionKey: "projects_task_proj2_task1_desc", tags: ["design", "ui"] },
+    { id: 't5', projectId: 'personal-website', titleKey: "projects_task_proj2_task2_title", completed: false, status: 'todo', priority: 'low', descriptionKey: "projects_task_proj2_task2_desc", tags: ["content", "writing"] },
   ]
 });
+
+const taskStatusOrder: TaskStatus[] = ['todo', 'in-progress', 'in-review', 'blocked', 'done'];
 
 
 export default function ProjectDetailPage() {
@@ -93,6 +104,20 @@ export default function ProjectDetailPage() {
 
   const [deletingProjectTaskId, setDeletingProjectTaskId] = useState<string | null>(null);
 
+  const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
+  const [editingProjectName, setEditingProjectName] = useState("");
+  const [editingProjectDescription, setEditingProjectDescription] = useState("");
+  const [editingProjectStatus, setEditingProjectStatus] = useState<ProjectStatus>('planning');
+  const [editingProjectStartDate, setEditingProjectStartDate] = useState<Date | undefined>();
+  const [editingProjectEndDate, setEditingProjectEndDate] = useState<Date | undefined>();
+  const [editingProjectFocus, setEditingProjectFocus] = useState(false);
+  const [editingProjectTagsString, setEditingProjectTagsString] = useState("");
+  
+  const [isBrowser, setIsBrowser] = useState(false);
+  useEffect(() => {
+    setIsBrowser(typeof window !== 'undefined');
+  }, []);
+
 
   useEffect(() => {
     if (projectId) {
@@ -102,27 +127,70 @@ export default function ProjectDetailPage() {
       setTimeout(() => {
         const foundProject = dummyProjectsData.find(p => p.id === projectId);
         if (foundProject) {
-          setProject({
+          const translatedProject = {
             ...foundProject,
-            name: foundProject.nameKey ? t(foundProject.nameKey) : '',
-            description: foundProject.descriptionKey ? t(foundProject.descriptionKey) : '',
-            milestones: (foundProject.milestones || []).map(m => ({...m, title: m.titleKey ? t(m.titleKey): ''})),
-            resources: (foundProject.resources || []).map(r => ({...r, title: r.titleKey ? t(r.titleKey) : ''}))
-          });
+            name: foundProject.nameKey ? t(foundProject.nameKey) : foundProject.name || '',
+            description: foundProject.descriptionKey ? t(foundProject.descriptionKey) : foundProject.description || '',
+            milestones: (foundProject.milestones || []).map(m => ({...m, title: m.titleKey ? t(m.titleKey): m.title || ''})),
+            resources: (foundProject.resources || []).map(r => ({...r, title: r.titleKey ? t(r.titleKey) : r.title || ''}))
+          };
+          setProject(translatedProject);
           setTasks((dummyTasksData[projectId] || []).map(task => ({
             ...task, 
-            title: task.titleKey ? t(task.titleKey) : '',
+            title: task.titleKey ? t(task.titleKey) : task.title || '',
             description: task.descriptionKey ? t(task.descriptionKey) : task.description,
+            tags: task.tags || [],
             completed: task.status === 'done'
           })));
-          setProjectNotes(localStorage.getItem(`project_notes_${projectId}`) || `<p>${t('project_detail_notes_placeholder', { projectName: foundProject.nameKey ? t(foundProject.nameKey) : '' })}</p>`);
-        } else {
-          console.error("Project not found");
+          setProjectNotes(localStorage.getItem(`project_notes_${projectId}`) || `<p>${t('project_detail_notes_placeholder', { projectName: translatedProject.name })}</p>`);
+        
+          setEditingProjectName(translatedProject.name);
+          setEditingProjectDescription(translatedProject.description);
+          setEditingProjectStatus(translatedProject.status);
+          setEditingProjectFocus(translatedProject.focus);
+          setEditingProjectStartDate(translatedProject.startDate ? parseISO(translatedProject.startDate) : undefined);
+          setEditingProjectEndDate(translatedProject.endDate ? parseISO(translatedProject.endDate) : undefined);
+          setEditingProjectTagsString(translatedProject.tags?.join(', ') || "");
+
         }
         setIsLoading(false);
       }, 500);
     }
-  }, [projectId, router, t]);
+  }, [projectId, t]);
+
+  const openEditProjectModal = useCallback(() => {
+    if (project) {
+      setEditingProjectName(project.name);
+      setEditingProjectDescription(project.description);
+      setEditingProjectStatus(project.status);
+      setEditingProjectFocus(project.focus);
+      setEditingProjectStartDate(project.startDate && isValid(parseISO(project.startDate)) ? parseISO(project.startDate) : undefined);
+      setEditingProjectEndDate(project.endDate && isValid(parseISO(project.endDate)) ? parseISO(project.endDate) : undefined);
+      setEditingProjectTagsString(project.tags?.join(', ') || "");
+      setIsEditProjectModalOpen(true);
+    }
+  }, [project]);
+
+  const handleSaveEditedProjectDetails = useCallback(() => {
+    if (!project) return;
+    if (!editingProjectName.trim()) {
+      alert(t('project_alert_name_required'));
+      return;
+    }
+    const tags = editingProjectTagsString.split(',').map(tag => tag.trim()).filter(tag => tag !== "");
+    const updatedProjectDetails: Partial<Project> = {
+      name: editingProjectName,
+      description: editingProjectDescription,
+      status: editingProjectStatus,
+      focus: editingProjectFocus,
+      startDate: editingProjectStartDate?.toISOString(),
+      endDate: editingProjectEndDate?.toISOString(),
+      tags: tags,
+    };
+    setProject(prev => prev ? { ...prev, ...updatedProjectDetails } : null);
+    setIsEditProjectModalOpen(false);
+  }, [project, editingProjectName, editingProjectDescription, editingProjectStatus, editingProjectFocus, editingProjectStartDate, editingProjectEndDate, editingProjectTagsString, t]);
+
 
   const handleSaveProjectNotes = useCallback((notes: string) => {
     setProjectNotes(notes);
@@ -137,13 +205,11 @@ export default function ProjectDetailPage() {
       id: Date.now().toString(),
       completed: newTaskData.status === 'done',
       projectId: project.id,
-      title: newTaskData.title, // Already provided by form
-      description: newTaskData.description
+      title: newTaskData.title, 
+      description: newTaskData.description,
+      tags: newTaskData.tags || []
     };
     setTasks(prevTasks => [newTask, ...prevTasks]);
-    // Note: dummyTasksData is not directly mutable like this in a real scenario. 
-    // This is for local simulation only.
-    // dummyTasksData[project.id] = [newTask, ...(dummyTasksData[project.id] || [])]; 
   }, [project]);
 
   const handleToggleTaskComplete = useCallback((taskId: string) => {
@@ -163,10 +229,7 @@ export default function ProjectDetailPage() {
 
   const handleDeleteTask = useCallback((taskId: string) => {
     setDeletingProjectTaskId(taskId);
-    setTimeout(() => {
-      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-      setDeletingProjectTaskId(null);
-    }, 300); 
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
   }, []);
 
   const handleEditTask = useCallback((task: Task) => {
@@ -196,7 +259,6 @@ export default function ProjectDetailPage() {
       return;
     }
     try {
-      // Basic URL validation, can be improved
       if (!newResourceUrl.startsWith('http://') && !newResourceUrl.startsWith('https://')) {
           throw new Error("Invalid URL");
       }
@@ -230,13 +292,99 @@ export default function ProjectDetailPage() {
   }, [project]);
 
 
-  const sortedTasks = React.useMemo(() => {
-    return [...tasks].sort((a, b) => {
-      if (a.status === 'done' && b.status !== 'done') return 1;
-      if (a.status !== 'done' && b.status === 'done') return -1;
-      return 0;
+  const groupedTasks = useMemo(() => {
+    const groups: Record<TaskStatus, Task[]> = {
+      todo: [],
+      'in-progress': [],
+      blocked: [],
+      'in-review': [],
+      done: [],
+    };
+    tasks.forEach(task => {
+      groups[task.status]?.push(task);
     });
+    return groups;
   }, [tasks]);
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination, draggableId } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      return;
+    }
+    
+    setTasks(prevTasks => {
+        const taskToMove = prevTasks.find(t => t.id === draggableId);
+        if (!taskToMove) return prevTasks;
+
+        const tasksWithoutMoved = prevTasks.filter(t => t.id !== draggableId);
+        
+        const updatedTask = { 
+          ...taskToMove, 
+          status: destination.droppableId as TaskStatus, 
+          completed: destination.droppableId === 'done' 
+        };
+        
+        const newTasksArray = [...tasksWithoutMoved];
+        
+        // Find the correct index to insert in the overall list,
+        // respecting the new status and the dropped position within that status column.
+        // This is a simplified approach: find other tasks in the destination column
+        // and insert relative to them.
+        let insertAtIndex = newTasksArray.length; // Default to end
+
+        const tasksInDestinationCol = tasksWithoutMoved.filter(t => t.status === destination.droppableId as TaskStatus);
+        if (tasksInDestinationCol.length > 0) {
+            if (destination.index < tasksInDestinationCol.length) {
+                const taskAtDestinationIndex = tasksInDestinationCol[destination.index];
+                insertAtIndex = newTasksArray.findIndex(t => t.id === taskAtDestinationIndex.id);
+            } else { // Dropped at the end of the destination column
+                if (tasksInDestinationCol.length > 0) {
+                    const lastTaskInCol = tasksInDestinationCol[tasksInDestinationCol.length - 1];
+                    insertAtIndex = newTasksArray.findIndex(t => t.id === lastTaskInCol.id) + 1;
+                } else { // Destination column was empty
+                    // Find first task of the next status group, or end of list
+                    const nextStatusIndex = taskStatusOrder.indexOf(destination.droppableId as TaskStatus) + 1;
+                    let foundNextGroup = false;
+                    for (let i = nextStatusIndex; i < taskStatusOrder.length; i++) {
+                        const firstTaskOfNextGroup = newTasksArray.find(t => t.status === taskStatusOrder[i]);
+                        if (firstTaskOfNextGroup) {
+                            insertAtIndex = newTasksArray.findIndex(t => t.id === firstTaskOfNextGroup.id);
+                            foundNextGroup = true;
+                            break;
+                        }
+                    }
+                    if (!foundNextGroup) insertAtIndex = newTasksArray.length;
+                }
+            }
+        } else { // Destination column was empty
+             const currentStatusIndex = taskStatusOrder.indexOf(destination.droppableId as TaskStatus);
+             let foundPreviousGroupLastTask = false;
+             for (let i = currentStatusIndex -1; i >=0; i--) {
+                 const tasksInPrevCol = newTasksArray.filter(t => t.status === taskStatusOrder[i]);
+                 if (tasksInPrevCol.length > 0) {
+                     const lastTaskInPrevCol = tasksInPrevCol[tasksInPrevCol.length-1];
+                     insertAtIndex = newTasksArray.findIndex(t=>t.id === lastTaskInPrevCol.id) +1;
+                     foundPreviousGroupLastTask = true;
+                     break;
+                 }
+             }
+             if(!foundPreviousGroupLastTask && currentStatusIndex > 0) { // prev columns were also empty
+                insertAtIndex = 0; // if it's the first column or all previous are empty
+             } else if (!foundPreviousGroupLastTask && currentStatusIndex === 0) {
+                insertAtIndex = 0;
+             }
+        }
+
+
+        newTasksArray.splice(insertAtIndex, 0, updatedTask);
+        return newTasksArray;
+    });
+  };
 
 
   if (isLoading) {
@@ -251,8 +399,13 @@ export default function ProjectDetailPage() {
     <PageWrapper title={project.name} className="pb-12">
       <Card className="mb-6 bg-card/80 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-2xl font-headline">{project.name}</CardTitle>
-          <CardDescription>{project.description}</CardDescription>
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-2xl font-headline">{project.name}</CardTitle>
+            <Button variant="outline" size="sm" onClick={openEditProjectModal} data-testid="edit-project-detail-btn">
+              <Edit3 className="mr-2 h-4 w-4" /> {t('project_detail_edit_button')}
+            </Button>
+          </div>
+          <CardDescription>{project.description || t('project_no_description_placeholder')}</CardDescription>
         </CardHeader>
         <CardContent className="pt-2">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-3">
@@ -260,8 +413,8 @@ export default function ProjectDetailPage() {
               {t(`project_status_${project.status.replace('-', '_')}`)}
             </Badge>
             {project.focus && (
-              <Badge variant="outline" className="text-xs">
-                {t('project_in_focus_badge')}
+              <Badge variant="outline" className="text-xs border-primary text-primary flex items-center gap-1">
+                <Star className="h-3 w-3" /> {t('project_in_focus_badge')}
               </Badge>
             )}
           </div>
@@ -279,6 +432,15 @@ export default function ProjectDetailPage() {
               </div>
             )}
           </div>
+           {project.tags && project.tags.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {project.tags.map(tag => (
+                <Badge key={tag} variant="secondary" className="text-xs">
+                  <TagIcon className="h-3 w-3 mr-1"/>{tag}
+                </Badge>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -308,14 +470,12 @@ export default function ProjectDetailPage() {
 
         <TabsContent value="tasks">
           <Card>
-            <CardHeader>
-              <CardTitle>{t('project_detail_tasks_card_title')}</CardTitle>
-               <div className="flex justify-end mt-[-2.5rem]">
+             <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle>{t('project_detail_tasks_card_title')}</CardTitle>
                 <Button size="sm" onClick={() => setIsTaskFormOpen(!isTaskFormOpen)}>
                   <PlusCircle className="mr-2 h-4 w-4" /> {isTaskFormOpen ? t('project_detail_close_form_button') : t('project_detail_add_task_button')}
                 </Button>
-              </div>
-            </CardHeader>
+              </CardHeader>
             <CardContent>
               <NewTaskForm 
                 onAddTask={handleAddTaskToProject} 
@@ -323,19 +483,85 @@ export default function ProjectDetailPage() {
                 onToggle={() => setIsTaskFormOpen(!isTaskFormOpen)}
                 formTitle={t('todo_new_task_form_title_project')}
               />
-              {sortedTasks.length > 0 ? (
-                <div className="space-y-3 mt-4">
-                  {sortedTasks.map(task => (
-                    <TaskItem 
-                      key={task.id} 
-                      task={task} 
-                      onToggleComplete={handleToggleTaskComplete} 
-                      onDelete={handleDeleteTask} 
-                      onEdit={handleEditTask}
-                      isDeleting={task.id === deletingProjectTaskId}
-                    />
-                  ))}
-                </div>
+              {tasks.length > 0 ? (
+                isBrowser ? (
+                  <DragDropContext onDragEnd={onDragEnd}>
+                    <div className="flex gap-4 overflow-x-auto pb-4 mt-6">
+                      {taskStatusOrder.map(status => {
+                        const tasksInGroup = groupedTasks[status];
+                        return (
+                          <Droppable key={status} droppableId={status}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                                className={cn(
+                                  "p-3 bg-muted/50 rounded-lg w-64 sm:w-72 lg:w-80 flex-shrink-0 transition-colors duration-150",
+                                  snapshot.isDraggingOver ? "bg-primary/10" : "bg-muted/50"
+                                )}
+                              >
+                                <div className="flex justify-between items-center mb-3">
+                                  <h3 className="font-semibold text-md capitalize">{t(`task_status_${status.replace('-', '_')}`)}</h3>
+                                  <Badge variant="secondary" className="text-xs">{tasksInGroup.length}</Badge>
+                                </div>
+                                <div className="space-y-3 min-h-[50px] max-h-[calc(100vh-380px)] overflow-y-auto pr-1">
+                                  {tasksInGroup.map((task, index) => (
+                                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                                      {(providedDraggable, snapshotDraggable) => (
+                                        <TaskItem 
+                                          task={task} 
+                                          onToggleComplete={handleToggleTaskComplete} 
+                                          onDelete={() => handleDeleteTask(task.id)} 
+                                          onEdit={handleEditTask}
+                                          isDeleting={task.id === deletingProjectTaskId}
+                                          onAnimationEnd={() => task.id === deletingProjectTaskId && setDeletingProjectTaskId(null)}
+                                          innerRef={providedDraggable.innerRef}
+                                          draggableProps={providedDraggable.draggableProps}
+                                          dragHandleProps={providedDraggable.dragHandleProps}
+                                          isDragging={snapshotDraggable.isDragging}
+                                        />
+                                      )}
+                                    </Draggable>
+                                  ))}
+                                  {provided.placeholder}
+                                  {tasksInGroup.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">{t('project_detail_no_tasks_in_status_placeholder')}</p>}
+                                </div>
+                              </div>
+                            )}
+                          </Droppable>
+                        );
+                      })}
+                    </div>
+                  </DragDropContext>
+                ) : (
+                  <div className="flex gap-4 overflow-x-auto pb-4 mt-6">
+                    {taskStatusOrder.map(status => {
+                      const tasksInGroup = groupedTasks[status];
+                      return (
+                        <div key={status} className="p-3 bg-muted/50 rounded-lg w-64 sm:w-72 lg:w-80 flex-shrink-0">
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="font-semibold text-md capitalize">{t(`task_status_${status.replace('-', '_')}`)}</h3>
+                            <Badge variant="secondary" className="text-xs">{tasksInGroup.length}</Badge>
+                          </div>
+                          <div className="space-y-3 min-h-[50px] max-h-[calc(100vh-380px)] overflow-y-auto pr-1"> 
+                            {tasksInGroup.map(task => (
+                              <TaskItem 
+                                key={task.id} 
+                                task={task} 
+                                onToggleComplete={handleToggleTaskComplete} 
+                                onDelete={() => handleDeleteTask(task.id)} 
+                                onEdit={handleEditTask}
+                                isDeleting={task.id === deletingProjectTaskId}
+                                onAnimationEnd={() => task.id === deletingProjectTaskId && setDeletingProjectTaskId(null)}
+                              />
+                            ))}
+                            {tasksInGroup.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">{t('project_detail_no_tasks_in_status_placeholder')}</p>}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )
               ) : (
                 <p className="text-muted-foreground text-center py-4">{t('project_detail_no_tasks_placeholder')}</p>
               )}
@@ -403,12 +629,108 @@ export default function ProjectDetailPage() {
       </Tabs>
       <TaskCompletionAnimation visible={taskCompleted} onAnimationEnd={() => setTaskCompleted(false)} />
 
+      <Dialog open={isEditProjectModalOpen} onOpenChange={setIsEditProjectModalOpen}>
+        <DialogContent data-testid="edit-project-detail-modal" className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t('project_modal_edit_title')}</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4 flex-grow max-h-[70vh] overflow-y-auto pr-2">
+            <div>
+              <Label htmlFor="editProjectName">{t('project_name_label')}</Label>
+              <Input 
+                id="editProjectName" 
+                value={editingProjectName}
+                onChange={(e) => setEditingProjectName(e.target.value)}
+                placeholder={t('project_name_placeholder')}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editProjectDescription">{t('common_description')} {t('common_optional_suffix')}</Label>
+              <Textarea 
+                id="editProjectDescription"
+                value={editingProjectDescription}
+                onChange={(e) => setEditingProjectDescription(e.target.value)}
+                placeholder={t('project_description_placeholder')}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editProjectTags">{t('common_tags')} {t('common_optional_suffix')}</Label>
+              <Input
+                id="editProjectTags"
+                value={editingProjectTagsString}
+                onChange={(e) => setEditingProjectTagsString(e.target.value)}
+                placeholder={t('common_tags_placeholder')}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editProjectStatus">{t('common_status')}</Label>
+              <Select value={editingProjectStatus} onValueChange={(value: ProjectStatus) => setEditingProjectStatus(value)}>
+                <SelectTrigger id="editProjectStatus">
+                  <SelectValue placeholder={t('project_status_placeholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectStatusOptions.map(option => (
+                    <SelectItem key={option} value={option}>{t(`project_status_${option.replace('-', '_')}`)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="editProjectStartDate">{t('common_start_date')} {t('common_optional_suffix')}</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant={"outline"} className="w-full justify-start text-left font-normal">
+                      <CalendarDays className="mr-2 h-4 w-4" />
+                      {editingProjectStartDate ? format(editingProjectStartDate, "PPP") : <span>{t('common_pick_a_date')}</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar mode="single" selected={editingProjectStartDate} onSelect={setEditingProjectStartDate} initialFocus />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <Label htmlFor="editProjectEndDate">{t('common_end_date')} {t('common_optional_suffix')}</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant={"outline"} className="w-full justify-start text-left font-normal">
+                      <CalendarDays className="mr-2 h-4 w-4" />
+                      {editingProjectEndDate ? format(editingProjectEndDate, "PPP") : <span>{t('common_pick_a_date')}</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar mode="single" selected={editingProjectEndDate} onSelect={setEditingProjectEndDate} disabled={(date) => editingProjectStartDate ? date < editingProjectStartDate : false} initialFocus />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2 pt-2">
+              <Switch 
+                id="editProjectFocus" 
+                checked={editingProjectFocus} 
+                onCheckedChange={setEditingProjectFocus}
+              />
+              <Label htmlFor="editProjectFocus" className="flex flex-col">
+                <span>{t('project_field_focus')}</span>
+                <span className="font-normal text-xs text-muted-foreground">{t('project_field_focus_description')}</span>
+              </Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild><Button variant="outline" onClick={() => setIsEditProjectModalOpen(false)}>{t('common_cancel')}</Button></DialogClose>
+            <Button onClick={handleSaveEditedProjectDetails}>{t('project_save_button')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
       <Dialog open={isMilestoneModalOpen} onOpenChange={setIsMilestoneModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('project_detail_milestone_modal_title')}</DialogTitle>
           </DialogHeader>
-          <div className="py-4 space-y-4">
+          <div className="py-4 space-y-4 flex-grow">
             <div>
               <Label htmlFor="milestoneTitle">{t('project_detail_milestone_title_label')}</Label>
               <Input id="milestoneTitle" value={newMilestoneTitle} onChange={e => setNewMilestoneTitle(e.target.value)} placeholder={t('project_detail_milestone_title_placeholder')} />
@@ -430,7 +752,7 @@ export default function ProjectDetailPage() {
           <DialogHeader>
             <DialogTitle>{t('project_detail_resource_modal_title')}</DialogTitle>
           </DialogHeader>
-          <div className="py-4 space-y-4">
+          <div className="py-4 space-y-4 flex-grow">
             <div>
               <Label htmlFor="resourceTitle">{t('project_detail_resource_title_label')}</Label>
               <Input id="resourceTitle" value={newResourceTitle} onChange={e => setNewResourceTitle(e.target.value)} placeholder={t('project_detail_resource_title_placeholder')} />
@@ -450,4 +772,4 @@ export default function ProjectDetailPage() {
     </PageWrapper>
   );
 }
-    
+

@@ -5,7 +5,7 @@ import type { Task, TaskPriority, TaskStatus } from '@/types/codex';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit2, Circle, CheckCircle2, XCircle, AlertTriangle, Eye } from 'lucide-react';
+import { Trash2, Edit2, Circle, CheckCircle2, XCircle, AlertTriangle, Eye, Tag, GripVertical } from 'lucide-react'; // Added GripVertical
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,11 @@ interface TaskItemProps {
   onEdit: (task: Task) => void; 
   isDeleting?: boolean;
   onAnimationEnd?: () => void; 
+  // Props for Draggable
+  innerRef?: React.Ref<HTMLDivElement>;
+  draggableProps?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  dragHandleProps?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  isDragging?: boolean;
 }
 
 const priorityClasses: Record<TaskPriority, string> = {
@@ -53,7 +58,18 @@ const statusColors: Record<TaskStatus, string> = {
 };
 
 
-export const TaskItem = React.memo(function TaskItem({ task, onToggleComplete, onDelete, onEdit, isDeleting, onAnimationEnd: onAnimationEndProp }: TaskItemProps) {
+export const TaskItem = React.memo(function TaskItem({ 
+  task, 
+  onToggleComplete, 
+  onDelete, 
+  onEdit, 
+  isDeleting, 
+  onAnimationEnd: onAnimationEndProp,
+  innerRef,
+  draggableProps,
+  dragHandleProps,
+  isDragging
+}: TaskItemProps) {
   const { t } = useTranslation('common');
   const StatusIcon = statusIcons[task.status];
 
@@ -65,21 +81,27 @@ export const TaskItem = React.memo(function TaskItem({ task, onToggleComplete, o
 
   return (
     <div 
+      ref={innerRef}
+      {...draggableProps}
       className={cn(
-        "flex items-start gap-3 p-3 pr-4 border-l-4 rounded-r-md bg-card shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden min-w-0", 
+        "flex items-start gap-2 p-3 pr-2 border-l-4 rounded-r-md bg-card shadow-sm hover:shadow-lg transition-shadow duration-200 overflow-hidden min-w-0 group", 
         priorityClasses[task.priority],
         task.status === 'done' && !isDeleting ? "opacity-70" : "",
-        isDeleting ? 'animate-fade-out-and-collapse' : ''
+        isDeleting ? 'animate-fade-out-and-collapse' : '',
+        isDragging ? 'shadow-2xl opacity-90 scale-105' : ''
       )}
       data-testid={`task-item-${task.id}`}
       onAnimationEnd={handleAnimationEnd}
     >
+      <div {...dragHandleProps} className="py-1 cursor-grab group-hover:opacity-100 opacity-50 transition-opacity">
+        <GripVertical className="h-5 w-5 text-muted-foreground" />
+      </div>
       <Checkbox
         id={`task-${task.id}`}
         checked={task.status === 'done'}
         onCheckedChange={() => onToggleComplete(task.id)}
         aria-label={t('todo_task_item_mark_complete_aria_label', { taskTitle: task.title, status: task.status === 'done' ? t('common_incomplete') : t('common_complete') })}
-        className="mt-1 ml-1"
+        className="mt-1"
         disabled={isDeleting}
       />
       <div className="flex-1 space-y-1 min-w-0"> 
@@ -129,8 +151,17 @@ export const TaskItem = React.memo(function TaskItem({ task, onToggleComplete, o
             {t(`task_status_${task.status.replace('-', '_')}`)}
           </Badge>
         </div>
+        {task.tags && task.tags.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {task.tags.map(tag => (
+              <Badge key={tag} variant="outline" className="text-xs px-1.5 py-0.5 bg-muted/50">
+                <Tag className="h-3 w-3 mr-1 text-muted-foreground"/>{tag}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
-      <div className="flex flex-col sm:flex-row gap-1 sm:gap-0 items-center">
+      <div className="flex flex-col sm:flex-row gap-1 sm:gap-0 items-center ml-auto">
         <Button variant="ghost" size="icon" onClick={() => onEdit(task)} className="h-8 w-8" aria-label={t('todo_task_item_edit_aria_label')} disabled={isDeleting}>
           <Edit2 className="h-4 w-4" />
         </Button>
@@ -143,4 +174,3 @@ export const TaskItem = React.memo(function TaskItem({ task, onToggleComplete, o
 });
 
 TaskItem.displayName = 'TaskItem';
-    

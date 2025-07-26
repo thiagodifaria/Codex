@@ -7,8 +7,8 @@ import React from 'react';
 import { I18nAppProvider } from '@/components/shared/i18n-provider';
 
 export const metadata: Metadata = {
-  title: 'Codex - Your Personal Productivity Hub',
-  description: 'Manage your journal, tasks, projects, and goals with Codex.',
+  title: 'Codex - Seu centro de produtividade pessoal',
+  description: 'Gerencie seu diário, tarefas, projetos e metas com o Codex.',
 };
 
 export default function RootLayout({
@@ -19,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
