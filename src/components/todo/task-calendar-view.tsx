@@ -45,7 +45,7 @@ export function TaskCalendarView({ tasks, initialSelectedDate = new Date() }: Ta
   };
 
   const modifiersClassNames = {
-    selected: 'day-selected', // Uses built-in styling for selected day
+    selected: 'day-selected', 
   };
 
   return (
@@ -81,7 +81,7 @@ export function TaskCalendarView({ tasks, initialSelectedDate = new Date() }: Ta
         </Card>
       </div>
       <div className="md:col-span-1">
-        <Card className="shadow-md min-h-[200px]"> {/* Ensure card has some min height */}
+        <Card className="shadow-md min-h-[200px]"> {}
           <CardHeader>
             <CardTitle className="text-lg flex items-center">
               <CalendarCheck2 className="mr-2 h-5 w-5 text-primary" />
@@ -96,7 +96,7 @@ export function TaskCalendarView({ tasks, initialSelectedDate = new Date() }: Ta
           <CardContent>
             {selectedDay ? (
               tasksForSelectedDay.length > 0 ? (
-                <ScrollArea className="h-[300px] lg:h-[350px]"> {/* Adjust height as needed */}
+                <ScrollArea className="h-[300px] lg:h-[350px]"> {}
                   <ul className="space-y-3 pr-3">
                     {tasksForSelectedDay.map(task => (
                       <li key={task.id} className="p-2.5 border rounded-md bg-muted/40 hover:bg-muted/70 transition-colors">

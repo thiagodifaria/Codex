@@ -44,8 +44,8 @@ const DialogContent = React.forwardRef<
       )}
       {...props}
     >
-      {/* Children (DialogHeader, form content, DialogFooter) will be rendered here */}
-      {/* The parent DialogPrimitive.Content will handle scrolling if content overflows max-h */}
+      {}
+      {}
       {children}
       <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
         <X className="h-4 w-4" />
@@ -76,7 +76,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "mt-auto flex flex-col-reverse pt-4 sm:flex-row sm:justify-end sm:space-x-2", // Added mt-auto and pt-4 for spacing
+      "mt-auto flex flex-col-reverse pt-4 sm:flex-row sm:justify-end sm:space-x-2", 
       className
     )}
     {...props}

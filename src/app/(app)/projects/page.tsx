@@ -49,7 +49,7 @@ export default function ProjectsPage() {
   const [projectFocus, setProjectFocus] = useState(false);
   const [projectTagsString, setProjectTagsString] = useState("");
   
-  // Filters and Sorting
+  
   const [tagFilter, setTagFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
   const [sortBy, setSortBy] = useState<SortableProjectKeys>('name');
@@ -130,7 +130,7 @@ export default function ProjectsPage() {
   const filteredAndSortedProjects = useMemo(() => {
     let processedProjects = [...projects];
 
-    // Apply filters
+    
     if (tagFilter) {
       processedProjects = processedProjects.filter(project => 
         project.tags?.some(tag => tag.toLowerCase().includes(tagFilter.toLowerCase()))
@@ -140,7 +140,7 @@ export default function ProjectsPage() {
       processedProjects = processedProjects.filter(project => project.status === statusFilter);
     }
 
-    // Apply sorting
+    
     processedProjects.sort((a, b) => {
       let comparison = 0;
       switch (sortBy) {
@@ -165,7 +165,7 @@ export default function ProjectsPage() {
           comparison = projectStatusOrder.indexOf(a.status) - projectStatusOrder.indexOf(b.status);
           break;
         case 'focus':
-          comparison = (a.focus === b.focus) ? 0 : a.focus ? -1 : 1; // true (focused) comes first
+          comparison = (a.focus === b.focus) ? 0 : a.focus ? -1 : 1; 
           break;
       }
       return sortOrder === 'asc' ? comparison : comparison * -1;
@@ -227,8 +227,8 @@ export default function ProjectsPage() {
               </Select>
             </div>
           </div>
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3"> {/* Adjusted to align sort order with other fields */}
-             <div className="lg:col-start-2"> {/* Placeholder div to align sort order or leave empty */}
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3"> {}
+             <div className="lg:col-start-2"> {}
              </div>
              <div className="lg:col-start-3">
                 <Label htmlFor="sortOrder" className="text-xs font-medium">{t('common_sort_order')}</Label>

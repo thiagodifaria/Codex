@@ -11,11 +11,11 @@ import type { JournalEntry, Goal } from "@/types/codex";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
-import { getDummyGoals, calculateProgress as calculateGoalProgress } from "../goals/page"; // Renamed to avoid conflict
+import { getDummyGoals, calculateProgress as calculateGoalProgress } from "../goals/page"; 
 import { format, parseISO, isValid } from 'date-fns';
 
 
-// Dummy journal entries for demonstration
+
 const getDummyEntries = (t: Function): JournalEntry[] => [
   { id: '1', date: new Date(2024, 6, 20).toISOString(), titleKey: "journal_dummy_entry1_title", contentKey: "journal_dummy_entry1_content" },
   { id: '2', date: new Date(2024, 6, 21).toISOString(), titleKey: "journal_dummy_entry2_title", contentKey: "journal_dummy_entry2_content" },
@@ -53,7 +53,7 @@ export default function DashboardPage() {
         subGoals: g.subGoals?.map(sg => ({...sg, title: sg.titleKey ? t(sg.titleKey) : sg.title || ''})),
         progress: calculateGoalProgress(g.subGoals) || g.progress || 0
       }));
-    setDashboardGoals(translatedGoals.slice(0, 2)); // Show a couple of goals for brevity
+    setDashboardGoals(translatedGoals.slice(0, 2)); 
   }, [t]);
 
   const todayEntry = entries.find(entry => isValid(parseISO(entry.date)) && format(parseISO(entry.date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd'));
@@ -143,7 +143,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {dashboardGoals.length > 0 ? dashboardGoals.slice(0,2).map(goal => ( // Limiting to 2 goals for brevity in this card
+              {dashboardGoals.length > 0 ? dashboardGoals.slice(0,2).map(goal => ( 
                 <div key={goal.id}>
                   <p className="text-sm">{goal.title}: {goal.progress}%</p>
                   <div className="w-full bg-muted rounded-full h-2.5 mt-1">

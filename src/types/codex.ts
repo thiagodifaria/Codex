@@ -28,7 +28,7 @@ export interface Task {
   dueDate?: string; 
   priority: TaskPriority;
   projectId?: string;
-  tags?: string[]; // Added tags
+  tags?: string[]; 
 }
 
 export interface JournalEntry {
@@ -38,7 +38,7 @@ export interface JournalEntry {
   titleKey?: string; 
   content: string; 
   contentKey?: string; 
-  tags?: string[]; // Added tags
+  tags?: string[]; 
 }
 
 export type ProjectStatus = 'planning' | 'active' | 'on-hold' | 'completed' | 'archived';
@@ -55,7 +55,7 @@ export interface Project {
   endDate?: string; 
   milestones?: Milestone[];
   resources?: ResourceLink[];
-  tags?: string[]; // Added tags
+  tags?: string[]; 
 }
 
 export interface Milestone {

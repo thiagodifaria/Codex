@@ -2,7 +2,7 @@
 import type { NavItemConfig } from '@/types/codex';
 import { LayoutDashboard, BookOpenText, ListChecks, Briefcase, Target, NotebookPen } from 'lucide-react';
 
-export const LOGO_ICON = NotebookPen; // This remains as is, icon component.
+export const LOGO_ICON = NotebookPen; 
 
 export const NAV_ITEMS_CONFIG: NavItemConfig[] = [
   {

@@ -4,38 +4,38 @@
 @tailwind utilities;
 
 body {
-  font-family: var(--font-inter), sans-serif; /* Ensure Inter is applied if defined as a variable */
+  font-family: var(--font-inter), sans-serif; 
 }
 
 @layer base {
   :root {
-    --background: 0 0% 95%; /* Light Gray #F2F2F2 */
-    --foreground: 0 0% 0%; /* Black #000000 */
+    --background: 0 0% 95%; 
+    --foreground: 0 0% 0%; 
 
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 0 0% 0%; /* Black */
+    --card: 0 0% 100%; 
+    --card-foreground: 0 0% 0%; 
 
-    --popover: 0 0% 100%; /* White */
-    --popover-foreground: 0 0% 0%; /* Black */
+    --popover: 0 0% 100%; 
+    --popover-foreground: 0 0% 0%; 
 
-    --primary: 0 0% 21.9%; /* Graphite Gray #383838 */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 0 0% 21.9%; 
+    --primary-foreground: 0 0% 100%; 
 
-    --secondary: 0 0% 92%; /* Lighter Gray for secondary elements */
-    --secondary-foreground: 0 0% 21.9%; /* Graphite Gray text on secondary */
+    --secondary: 0 0% 92%; 
+    --secondary-foreground: 0 0% 21.9%; 
 
-    --muted: 0 0% 96.1%; /* Default Muted */
-    --muted-foreground: 0 0% 45.1%; /* Default Muted Foreground */
+    --muted: 0 0% 96.1%; 
+    --muted-foreground: 0 0% 45.1%; 
 
-    --accent: 0 0% 21.9%; /* Graphite Gray #383838 for accents */
-    --accent-foreground: 0 0% 100%; /* White */
+    --accent: 0 0% 21.9%; 
+    --accent-foreground: 0 0% 100%; 
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 89.8%; /* Default Border */
-    --input: 0 0% 94%; /* Slightly off-white for input background */
-    --ring: 0 0% 21.9%; /* Graphite Gray for focus rings */
+    --border: 0 0% 89.8%; 
+    --input: 0 0% 94%; 
+    --ring: 0 0% 21.9%; 
 
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -44,20 +44,20 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
 
-    /* Sidebar Specific Colors - Light Theme */
-    --sidebar-background: 0 0% 100%; /* White */
-    --sidebar-foreground: 0 0% 0%; /* Black */
-    --sidebar-primary: 0 0% 90%; /* Grayish #E6E6E6 for active/primary items */
-    --sidebar-primary-foreground: 0 0% 0%; /* Black text on active items */
-    --sidebar-accent: 0 0% 92%; /* Lighter Gray #EAEAEA for hover/accent */
-    --sidebar-accent-foreground: 0 0% 21.9%; /* Graphite Gray #383838 text on hover/accent */
-    --sidebar-border: 0 0% 89.8%; /* Light Gray border #E5E5E5 */
-    --sidebar-ring: 0 0% 21.9%; /* Graphite Gray #383838 ring */
+    
+    --sidebar-background: 0 0% 100%; 
+    --sidebar-foreground: 0 0% 0%; 
+    --sidebar-primary: 0 0% 90%; 
+    --sidebar-primary-foreground: 0 0% 0%; 
+    --sidebar-accent: 0 0% 92%; 
+    --sidebar-accent-foreground: 0 0% 21.9%; 
+    --sidebar-border: 0 0% 89.8%; 
+    --sidebar-ring: 0 0% 21.9%; 
   }
 
   .dark {
-    --background: 0 0% 10%; /* Dark Background */
-    --foreground: 0 0% 95%; /* Light Foreground */
+    --background: 0 0% 10%; 
+    --foreground: 0 0% 95%; 
 
     --card: 0 0% 12%;
     --card-foreground: 0 0% 95%;
@@ -65,17 +65,17 @@ body {
     --popover: 0 0% 12%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 0 0% 85%; /* Light Gray for primary buttons */
-    --primary-foreground: 0 0% 10%; /* Dark text on primary */
+    --primary: 0 0% 85%; 
+    --primary-foreground: 0 0% 10%; 
 
-    --secondary: 0 0% 20%; /* Darker gray for secondary buttons */
-    --secondary-foreground: 0 0% 95%; /* Light text on secondary */
+    --secondary: 0 0% 20%; 
+    --secondary-foreground: 0 0% 95%; 
 
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 60%;
 
-    --accent: 0 0% 85%; /* Light Gray for accents */
-    --accent-foreground: 0 0% 10%; /* Dark text on accent */
+    --accent: 0 0% 85%; 
+    --accent-foreground: 0 0% 10%; 
 
     --destructive: 0 70% 50.2%;
     --destructive-foreground: 0 0% 98%;
@@ -84,15 +84,15 @@ body {
     --input: 0 0% 20%;
     --ring: 0 0% 85%;
 
-    /* Sidebar Specific Colors - Dark Theme */
-    --sidebar-background: 0 0% 8%; /* Dark gray sidebar */
-    --sidebar-foreground: 0 0% 80%; /* Light gray text */
-    --sidebar-primary: 0 0% 85%; /* Light Gray for active/primary items */
-    --sidebar-primary-foreground: 0 0% 8%; /* Dark text on active items */
-    --sidebar-accent: 0 0% 18%; /* Slightly lighter dark gray for hover */
-    --sidebar-accent-foreground: 0 0% 90%; /* Light text on hover */
-    --sidebar-border: 0 0% 15%; /* Darker border */
-    --sidebar-ring: 0 0% 85%; /* Light gray ring */
+    
+    --sidebar-background: 0 0% 8%; 
+    --sidebar-foreground: 0 0% 80%; 
+    --sidebar-primary: 0 0% 85%; 
+    --sidebar-primary-foreground: 0 0% 8%; 
+    --sidebar-accent: 0 0% 18%; 
+    --sidebar-accent-foreground: 0 0% 90%; 
+    --sidebar-border: 0 0% 15%; 
+    --sidebar-ring: 0 0% 85%; 
   }
 }
 
@@ -104,9 +104,9 @@ body {
     @apply bg-background text-foreground;
   }
 
-  /* Tiptap / ProseMirror specific styles */
+  
   .ProseMirror {
-    @apply outline-none; /* Tailwind focus rings will be used via editorProps */
+    @apply outline-none; 
   }
 
   .ProseMirror p.is-editor-empty:first-child::before {
@@ -117,14 +117,14 @@ body {
     height: 0;
   }
 
-  /* Ensure prose styles from Tailwind Typography apply correctly within Tiptap */
+  
   .ProseMirror > * + * {
-    margin-top: 0.75em; /* Default from prose, adjust if needed */
+    margin-top: 0.75em; 
   }
 
   .ProseMirror ul,
   .ProseMirror ol {
-    @apply my-4 pl-6; /* Tailwind prose styles */
+    @apply my-4 pl-6; 
   }
   .ProseMirror ul {
     @apply list-disc;
@@ -132,24 +132,24 @@ body {
   .ProseMirror ol {
     @apply list-decimal;
   }
-  .ProseMirror li > p { /* Nested paragraphs in list items */
+  .ProseMirror li > p { 
     @apply my-0;
   }
 
   .ProseMirror blockquote {
-    @apply my-4 border-l-4 border-muted-foreground pl-4 italic; /* Tailwind prose styles */
+    @apply my-4 border-l-4 border-muted-foreground pl-4 italic; 
   }
 
   .ProseMirror hr {
-    @apply my-4 border-border; /* Tailwind prose styles */
+    @apply my-4 border-border; 
   }
 
   .ProseMirror code {
-    @apply rounded bg-muted px-1 py-0.5 font-mono text-sm; /* Tailwind prose styles */
+    @apply rounded bg-muted px-1 py-0.5 font-mono text-sm; 
   }
 
   .ProseMirror pre {
-    @apply my-4 overflow-x-auto rounded bg-muted p-4 font-mono text-sm; /* Tailwind prose styles */
+    @apply my-4 overflow-x-auto rounded bg-muted p-4 font-mono text-sm; 
   }
   .ProseMirror pre code {
     @apply bg-transparent p-0 font-normal;
@@ -159,21 +159,21 @@ body {
     @apply text-primary underline;
   }
 
-  /* Tailwind Typography Plugin for .prose class */
+  
   .prose {
     color: hsl(var(--foreground));
   }
   .prose h1 { @apply text-4xl font-bold mb-4 mt-6; }
   .prose h2 { @apply text-3xl font-semibold mb-3 mt-5; }
   .prose h3 { @apply text-2xl font-semibold mb-2 mt-4; }
-  /* Add more prose styles as needed for other elements */
+  
 
   .dark .prose {
     color: hsl(var(--foreground));
   }
   .dark .prose a {
-    @apply text-primary; /* Ensure primary color is used for links in dark mode */
+    @apply text-primary; 
   }
-  /* If using prose-invert for dark mode, it will handle many dark styles automatically */
+  
 
 }

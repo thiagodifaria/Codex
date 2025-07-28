@@ -35,9 +35,9 @@ export default function SettingsPage() {
     if (typeof window !== 'undefined') {
       const storedTheme = localStorage.getItem("theme") as Theme | null;
       if (storedTheme) return storedTheme;
-      // Check system preference if no theme is stored
-      // const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      // if (systemPrefersDark) return 'dark'; // This line was potentially problematic
+      
+      
+      
     }
     return 'system'; 
   });
@@ -53,8 +53,8 @@ export default function SettingsPage() {
         root.classList.add("dark");
       } else if (themeToApply === "light") {
         root.classList.remove("dark");
-      } else { // theme === 'system'
-        root.classList.remove("dark"); // Reset first
+      } else { 
+        root.classList.remove("dark"); 
         if (isSystemCurrentlyDark) {
           root.classList.add("dark");
         }
@@ -67,7 +67,7 @@ export default function SettingsPage() {
     }
 
     const mediaQueryListener = (e: MediaQueryListEvent) => {
-      if (localStorage.getItem("theme") === "system") { // Check localStorage directly
+      if (localStorage.getItem("theme") === "system") { 
         if (e.matches) {
           root.classList.add("dark");
         } else {
@@ -84,9 +84,9 @@ export default function SettingsPage() {
   }, [currentTheme]);
 
   useEffect(() => {
-    // Sync local state with i18n language, e.g., if changed by detector
+    
      if (i18n.language && i18n.language !== currentLanguage) {
-      setCurrentLanguage(i18n.language.split('-')[0]); // Use base language e.g. 'en' from 'en-US'
+      setCurrentLanguage(i18n.language.split('-')[0]); 
     }
   }, [i18n.language, currentLanguage]);
 

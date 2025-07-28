@@ -26,7 +26,7 @@ const resources = {
 
 const i18nChain = i18n.use(initReactI18next);
 
-// Only use LanguageDetector in the browser
+
 if (typeof window !== 'undefined') {
   i18nChain.use(LanguageDetector);
 }
@@ -34,10 +34,10 @@ if (typeof window !== 'undefined') {
 i18nChain.init({
   resources,
   fallbackLng: 'en',
-  // debug: process.env.NODE_ENV === 'development', // Removed for cleaner logs
+  
   supportedLngs: Object.keys(supportedLngs),
   interpolation: {
-    escapeValue: false, // React already safes from xss
+    escapeValue: false, 
   },
   detection: {
     order: ['localStorage', 'navigator', 'htmlTag'],

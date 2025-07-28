@@ -17,7 +17,7 @@ export default function TaskCompletionAnimation({ onAnimationEnd, visible }: Tas
       const timer = setTimeout(() => {
         setShow(false);
         onAnimationEnd?.();
-      }, 1500); // Animation duration
+      }, 1500); 
       return () => clearTimeout(timer);
     }
   }, [visible, onAnimationEnd]);

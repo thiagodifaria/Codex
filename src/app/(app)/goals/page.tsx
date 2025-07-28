@@ -160,7 +160,7 @@ export default function GoalsPage() {
     setHabits(prevHabits => prevHabits.map(habit => {
       if (habit.id === habitId) {
         const isCurrentlyCheckedInForDate = habit.lastCheckedIn && isValid(parseISO(habit.lastCheckedIn)) && format(parseISO(habit.lastCheckedIn), 'yyyy-MM-dd') === date;
-        return { ...habit, lastCheckedIn: isCurrentlyCheckedInForDate ? undefined : new Date(date + 'T12:00:00Z').toISOString() }; // Adding time to make ISO string valid
+        return { ...habit, lastCheckedIn: isCurrentlyCheckedInForDate ? undefined : new Date(date + 'T12:00:00Z').toISOString() }; 
       }
       return habit;
     }));

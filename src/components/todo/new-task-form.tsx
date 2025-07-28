@@ -53,7 +53,7 @@ export function NewTaskForm({ onAddTask, isOpen, onToggle, formTitle }: NewTaskF
       status,
       tags,
     });
-    // Reset form
+    
     setTitle("");
     setDescription("");
     setDueDate(undefined);

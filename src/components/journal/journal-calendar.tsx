@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 interface JournalCalendarProps {
   selectedDate: Date | undefined;
   onDateSelect: (date: Date | undefined) => void;
-  // Potentially add markedDates or events here
+  
 }
 
 export function JournalCalendar({ selectedDate, onDateSelect }: JournalCalendarProps) {

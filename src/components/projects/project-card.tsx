@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, CalendarDays, Edit3, Tag as TagIcon } from "lucide-react"; // Renamed Tag to TagIcon
+import { Briefcase, CalendarDays, Edit3, Tag as TagIcon } from "lucide-react"; 
 import { format, parseISO, isValid } from 'date-fns';
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";

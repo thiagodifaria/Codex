@@ -51,7 +51,7 @@ export const TiptapEditor: React.FC<TiptapEditorProps> = ({
             class: 'my-4 border-border',
           },
         },
-        // Other StarterKit defaults are generally good
+        
       }),
       Placeholder.configure({
         placeholder: placeholder || 'Write something …',

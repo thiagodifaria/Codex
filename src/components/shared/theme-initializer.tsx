@@ -14,7 +14,7 @@ export function ThemeInitializer() {
         root.classList.add('dark');
       } else if (theme === 'light') {
         root.classList.remove('dark');
-      } else { // 'system' or no theme set
+      } else { 
         if (systemPrefersDark) {
           root.classList.add('dark');
         } else {
@@ -25,9 +25,9 @@ export function ThemeInitializer() {
 
     applyInitialTheme();
 
-    // Este componente lida apenas com o carregamento inicial.
-    // A SettingsPage lida com a escuta de mudanças do sistema se 'system' estiver selecionado.
+    
+    
   }, []);
 
-  return null; // Este componente não renderiza nada visível
+  return null; 
 }

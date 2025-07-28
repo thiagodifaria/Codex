@@ -8,15 +8,15 @@ import { NewTaskForm } from "@/components/todo/new-task-form";
 import { TaskItem } from "@/components/todo/task-item";
 import type { Task, TaskPriority, TaskStatus } from '@/types/codex';
 import TaskCompletionAnimation from '@/components/shared/task-completion-animation';
-import { PlusCircle, ListChecks, Tag, Filter, ArrowDownUp, CalendarDays } from "lucide-react"; // Added CalendarDays
+import { PlusCircle, ListChecks, Tag, Filter, ArrowDownUp, CalendarDays } from "lucide-react"; 
 import { Card } from '@/components/ui/card'; 
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from 'react-i18next';
 import { compareAsc, compareDesc, parseISO } from 'date-fns';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Added Tabs
-import { TaskCalendarView } from '@/components/todo/task-calendar-view'; // Added TaskCalendarView
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; 
+import { TaskCalendarView } from '@/components/todo/task-calendar-view'; 
 
 const getDummyTasks = (t: Function): Task[] => [
   { id: '1', titleKey: "todo_dummy_task1_title", descriptionKey: "todo_dummy_task1_desc", status: 'todo', dueDate: new Date(2024, 7, 15).toISOString(), priority: 'high', tags: ['personal', 'health'] },
@@ -51,12 +51,12 @@ export default function TodoPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null); 
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   
-  // Filters
+  
   const [tagFilter, setTagFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<TaskStatus | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<TaskPriority | 'all'>('all');
 
-  // Sorting
+  
   const [sortBy, setSortBy] = useState<SortableTaskKeys>('dueDate');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
@@ -104,7 +104,7 @@ export default function TodoPage() {
   const filteredAndSortedTasks = useMemo(() => {
     let processedTasks = [...tasks];
 
-    // Apply filters
+    
     if (tagFilter) {
       processedTasks = processedTasks.filter(task => 
         task.tags?.some(tag => tag.toLowerCase().includes(tagFilter.toLowerCase()))
@@ -117,7 +117,7 @@ export default function TodoPage() {
       processedTasks = processedTasks.filter(task => task.priority === priorityFilter);
     }
 
-    // Apply sorting
+    
     const priorityOrderMap: Record<TaskPriority, number> = { lowest: 4, low: 3, medium: 2, high: 1, highest: 0 };
     
     processedTasks.sort((a, b) => {
@@ -137,13 +137,13 @@ export default function TodoPage() {
           comparison = a.title.localeCompare(b.title);
           break;
         case 'status':
-          comparison = a.status.localeCompare(b.status); // Simpler sort for now
+          comparison = a.status.localeCompare(b.status); 
           break;
       }
       return sortOrder === 'asc' ? comparison : comparison * -1;
     });
     
-    // Secondary sort: keep 'done' tasks at the bottom if not sorting by status
+    
     if (sortBy !== 'status') {
         processedTasks.sort((a, b) => {
             if (a.status === 'done' && b.status !== 'done') return 1;

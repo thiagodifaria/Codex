@@ -52,8 +52,8 @@ const getDummyProjectsData = (t: Function): Project[] => [
       { id: 'm2', titleKey: "projects_dummy_proj1_milestone2_title", dueDate: "2024-10-15", completed: false },
     ],
     resources: [
-      { id: 'r1', titleKey: "projects_dummy_proj1_resource1_title", url: "https://figma.com/..." },
-      { id: 'r2', titleKey: "projects_dummy_proj1_resource2_title", url: "https://docs.example.com/..." },
+      { id: 'r1', titleKey: "projects_dummy_proj1_resource1_title", url: "https:
+      { id: 'r2', titleKey: "projects_dummy_proj1_resource2_title", url: "https:
     ]
   },
   { 
@@ -259,7 +259,7 @@ export default function ProjectDetailPage() {
       return;
     }
     try {
-      if (!newResourceUrl.startsWith('http://') && !newResourceUrl.startsWith('https://')) {
+      if (!newResourceUrl.startsWith('http:
           throw new Error("Invalid URL");
       }
       new URL(newResourceUrl);
@@ -331,23 +331,23 @@ export default function ProjectDetailPage() {
         
         const newTasksArray = [...tasksWithoutMoved];
         
-        // Find the correct index to insert in the overall list,
-        // respecting the new status and the dropped position within that status column.
-        // This is a simplified approach: find other tasks in the destination column
-        // and insert relative to them.
-        let insertAtIndex = newTasksArray.length; // Default to end
+        
+        
+        
+        
+        let insertAtIndex = newTasksArray.length; 
 
         const tasksInDestinationCol = tasksWithoutMoved.filter(t => t.status === destination.droppableId as TaskStatus);
         if (tasksInDestinationCol.length > 0) {
             if (destination.index < tasksInDestinationCol.length) {
                 const taskAtDestinationIndex = tasksInDestinationCol[destination.index];
                 insertAtIndex = newTasksArray.findIndex(t => t.id === taskAtDestinationIndex.id);
-            } else { // Dropped at the end of the destination column
+            } else { 
                 if (tasksInDestinationCol.length > 0) {
                     const lastTaskInCol = tasksInDestinationCol[tasksInDestinationCol.length - 1];
                     insertAtIndex = newTasksArray.findIndex(t => t.id === lastTaskInCol.id) + 1;
-                } else { // Destination column was empty
-                    // Find first task of the next status group, or end of list
+                } else { 
+                    
                     const nextStatusIndex = taskStatusOrder.indexOf(destination.droppableId as TaskStatus) + 1;
                     let foundNextGroup = false;
                     for (let i = nextStatusIndex; i < taskStatusOrder.length; i++) {
@@ -361,7 +361,7 @@ export default function ProjectDetailPage() {
                     if (!foundNextGroup) insertAtIndex = newTasksArray.length;
                 }
             }
-        } else { // Destination column was empty
+        } else { 
              const currentStatusIndex = taskStatusOrder.indexOf(destination.droppableId as TaskStatus);
              let foundPreviousGroupLastTask = false;
              for (let i = currentStatusIndex -1; i >=0; i--) {
@@ -373,8 +373,8 @@ export default function ProjectDetailPage() {
                      break;
                  }
              }
-             if(!foundPreviousGroupLastTask && currentStatusIndex > 0) { // prev columns were also empty
-                insertAtIndex = 0; // if it's the first column or all previous are empty
+             if(!foundPreviousGroupLastTask && currentStatusIndex > 0) { 
+                insertAtIndex = 0; 
              } else if (!foundPreviousGroupLastTask && currentStatusIndex === 0) {
                 insertAtIndex = 0;
              }

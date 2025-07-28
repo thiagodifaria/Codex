@@ -5,7 +5,7 @@ import type { Task, TaskPriority, TaskStatus } from '@/types/codex';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit2, Circle, CheckCircle2, XCircle, AlertTriangle, Eye, Tag, GripVertical } from 'lucide-react'; // Added GripVertical
+import { Trash2, Edit2, Circle, CheckCircle2, XCircle, AlertTriangle, Eye, Tag, GripVertical } from 'lucide-react'; 
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -18,10 +18,10 @@ interface TaskItemProps {
   onEdit: (task: Task) => void; 
   isDeleting?: boolean;
   onAnimationEnd?: () => void; 
-  // Props for Draggable
+  
   innerRef?: React.Ref<HTMLDivElement>;
-  draggableProps?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  dragHandleProps?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  draggableProps?: any; 
+  dragHandleProps?: any; 
   isDragging?: boolean;
 }
 

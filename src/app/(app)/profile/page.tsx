@@ -15,7 +15,7 @@ export default function ProfilePage() {
   const username = "test_user#1234"; 
   const [displayName, setDisplayName] = useState(t('profile_default_display_name'));
   const [bio, setBio] = useState(t('profile_default_bio'));
-  // Email is usually not directly editable by user after creation for security/identity reasons
+  
   const email = "user@example.com";
 
   return (
@@ -30,7 +30,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-4">
             <Avatar className="w-32 h-32">
-              <AvatarImage src="https://placehold.co/200x200.png" alt={t('profile_your_avatar_title')} data-ai-hint="profile avatar" />
+              <AvatarImage src="https://github.com/shadcn.png" />
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <Button variant="outline" size="sm">{t('profile_change_avatar_button')}</Button>

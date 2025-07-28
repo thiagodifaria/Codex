@@ -1,4 +1,4 @@
-// src/components/shared/i18n-provider.tsx
+
 'use client';
 
 import { I18nextProvider } from 'react-i18next';
@@ -15,14 +15,14 @@ export function I18nAppProvider({ children }: I18nAppProviderProps) {
 
   useEffect(() => {
     setIsClient(true);
-    // Ensure HTML lang attribute is updated when language changes
+    
     const handleLanguageChanged = (lng: string) => {
       if (typeof document !== 'undefined') {
         document.documentElement.lang = lng;
       }
     };
     i18nInstance.on('languageChanged', handleLanguageChanged);
-    // Set initial lang attribute
+    
     if (i18nInstance.resolvedLanguage) {
       if (typeof document !== 'undefined') {
         document.documentElement.lang = i18nInstance.resolvedLanguage;
@@ -34,7 +34,7 @@ export function I18nAppProvider({ children }: I18nAppProviderProps) {
   }, []);
 
   if (!isClient) {
-    // Avoid rendering children that might use useTranslation before i18n is ready client-side
+    
     return null; 
   }
 
