@@ -4,7 +4,20 @@
 
 ## 🌐 Online Demo
 
-**Access the application in real time**: [Coming soon - Production deployment]
+**Access the application in real time**: [https://codexdifaria.netlify.app/login](https://codexdifaria.netlify.app/login)
+
+The application is hosted on Netlify and can be tested online directly from the login screen.
+
+## Test Credentials
+
+```text
+Email: email@example.com
+Password: test123
+Username: @test_user
+Display name: Usuario Teste
+```
+
+> **Tip**: Open `https://codexdifaria.netlify.app/login` to validate the full application flow.
 
 ## 📕 Description
 

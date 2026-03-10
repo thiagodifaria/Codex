@@ -49,6 +49,22 @@ Codex is a **comprehensive personal productivity platform** that integrates digi
 
 ## ⚡ Quick Start
 
+## Live Demo
+
+**View Live Application**: [https://codexdifaria.netlify.app/login](https://codexdifaria.netlify.app/login)
+
+**Test Credentials:**
+- **Email:** `email@example.com`
+- **Password:** `test123`
+- **Username:** `@test_user`
+- **Display name:** `Usuario Teste`
+
+### Option 1: View Online (Recommended)
+```bash
+# Open the deployed login page
+https://codexdifaria.netlify.app/login
+```
+
 ### Prerequisites
 ```bash
 # Required
