@@ -119,6 +119,22 @@ The application stands out for its holistic approach to productivity, combining 
 
 ## 🚀 Installation and Configuration
 
+## Test Credentials
+
+Use the credentials below to validate the current app flow:
+
+```text
+Email: email@example.com
+Password: test123
+Username: @test_user
+Display name: Usuario Teste
+```
+
+Notes:
+- Email login accepts exactly `email@example.com` and `test123`.
+- The `Continue with Google` button also signs in using the same demo account.
+- The application starts with no tasks, projects, goals, habits, or journal entries so the tester can validate empty states first.
+
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/your-username/codex.git

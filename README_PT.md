@@ -119,6 +119,22 @@ A aplicação se destaca por sua abordagem holística à produtividade, combinan
 
 ## 🚀 Instalação e Configuração
 
+## Credenciais de Teste
+
+Use as credenciais abaixo para validar o fluxo atual da aplicação:
+
+```text
+Email: email@example.com
+Senha: test123
+Nome de usuário: @test_user
+Nome de exibição: Usuario Teste
+```
+
+Observações:
+- O login por e-mail aceita exatamente `email@example.com` e `test123`.
+- O botão `Continuar com Google` também entra no sistema com a mesma conta de teste.
+- A aplicação inicia sem tarefas, projetos, metas, hábitos ou entradas de diário para facilitar os testes manuais.
+
 ### 1. Clonar o Repositório
 ```bash
 git clone https://github.com/seu-usuario/codex.git

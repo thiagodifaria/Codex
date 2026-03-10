@@ -18,15 +18,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"; 
 import { Switch } from "@/components/ui/switch";
 import { format, parseISO, isValid, compareAsc, compareDesc } from 'date-fns';
-
-
-const getDummyProjects = (t: Function): Project[] => [
-  { id: 'codex-app', nameKey: "projects_dummy_proj1_name", descriptionKey: "projects_dummy_proj1_desc", status: 'active', focus: true, startDate: new Date(2024, 5, 1).toISOString(), endDate: new Date(2024, 11, 31).toISOString(), tags: ["dev", "productivity", "saas"] },
-  { id: 'personal-website', nameKey: "projects_dummy_proj2_name", descriptionKey: "projects_dummy_proj2_desc", status: 'planning', focus: false, startDate: new Date(2024, 8, 1).toISOString(), tags: ["web", "portfolio"] },
-  { id: 'learn-rust', nameKey: "projects_dummy_proj3_name", descriptionKey: "projects_dummy_proj3_desc", status: 'active', focus: false, tags: ["learning", "programming", "rust"], startDate: new Date(2024, 0, 10).toISOString() },
-  { id: 'kitchen-reno', nameKey: "projects_dummy_proj4_name", descriptionKey: "projects_dummy_proj4_desc", status: 'completed', focus: false, startDate: new Date(2023, 0, 15).toISOString(), endDate: new Date(2023, 3, 30).toISOString(), tags: ["home", "renovation"] },
-  { id: 'garden-project', name: "Backyard Garden Setup", description: "Plan and build a vegetable garden.", status: 'planning', focus: true, tags: ["home", "outdoors", "gardening"] },
-];
+import { loadProjects, saveProjects } from '@/lib/storage';
+import { getProjectStatusTranslationKey } from '@/lib/status-labels';
 
 const projectStatusOptions: ProjectStatus[] = ['planning', 'active', 'on-hold', 'completed', 'archived'];
 type SortableProjectKeys = 'name' | 'startDate' | 'endDate' | 'status' | 'focus';
@@ -54,16 +47,20 @@ export default function ProjectsPage() {
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
   const [sortBy, setSortBy] = useState<SortableProjectKeys>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [hasLoadedProjects, setHasLoadedProjects] = useState(false);
 
 
   useEffect(() => {
-    const translatedProjects = getDummyProjects(t).map(p => ({
-      ...p,
-      name: p.nameKey ? t(p.nameKey) : p.name || '',
-      description: p.descriptionKey ? t(p.descriptionKey) : p.description || ''
-    }));
-    setProjects(translatedProjects);
-  }, [t]);
+    setProjects(loadProjects());
+    setHasLoadedProjects(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedProjects) {
+      return;
+    }
+    saveProjects(projects);
+  }, [hasLoadedProjects, projects]);
 
   const resetFormStates = useCallback(() => {
     setProjectName("");
@@ -83,7 +80,7 @@ export default function ProjectsPage() {
 
   const openEditProjectModal = useCallback((project: Project) => {
     setCurrentProject(project);
-    setProjectName(project.name);
+    setProjectName(project.name || "");
     setProjectDescription(project.description || "");
     setProjectStatus(project.status);
     setProjectStartDate(project.startDate && isValid(parseISO(project.startDate)) ? parseISO(project.startDate) : undefined);
@@ -145,7 +142,7 @@ export default function ProjectsPage() {
       let comparison = 0;
       switch (sortBy) {
         case 'name':
-          comparison = a.name.localeCompare(b.name);
+          comparison = (a.name || '').localeCompare(b.name || '');
           break;
         case 'startDate':
           const dateAStart = a.startDate ? parseISO(a.startDate) : null;
@@ -206,7 +203,7 @@ export default function ProjectsPage() {
                 <SelectContent>
                   <SelectItem value="all">{t('common_all_statuses')}</SelectItem>
                   {projectStatusOptions.map(opt => (
-                    <SelectItem key={opt} value={opt}>{t(`project_status_${opt.replace('-', '_')}`)}</SelectItem>
+                    <SelectItem key={opt} value={opt}>{t(getProjectStatusTranslationKey(opt))}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -310,7 +307,7 @@ export default function ProjectsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {projectStatusOptions.map(option => (
-                    <SelectItem key={option} value={option}>{t(`project_status_${option.replace('-', '_')}`)}</SelectItem>
+                    <SelectItem key={option} value={option}>{t(getProjectStatusTranslationKey(option))}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -389,4 +386,3 @@ export default function ProjectsPage() {
     </PageWrapper>
   );
 }
-

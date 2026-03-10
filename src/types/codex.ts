@@ -19,11 +19,11 @@ export type TaskPriority = 'lowest' | 'low' | 'medium' | 'high' | 'highest';
 
 export interface Task {
   id: string;
-  title: string; 
+  title?: string; 
   titleKey?: string; 
   description?: string; 
   descriptionKey?: string; 
-  completed: boolean; 
+  completed?: boolean; 
   status: TaskStatus;
   dueDate?: string; 
   priority: TaskPriority;
@@ -34,9 +34,9 @@ export interface Task {
 export interface JournalEntry {
   id: string;
   date: string; 
-  title: string; 
+  title?: string; 
   titleKey?: string; 
-  content: string; 
+  content?: string; 
   contentKey?: string; 
   tags?: string[]; 
 }
@@ -45,9 +45,9 @@ export type ProjectStatus = 'planning' | 'active' | 'on-hold' | 'completed' | 'a
 
 export interface Project {
   id: string;
-  name: string; 
+  name?: string; 
   nameKey?: string; 
-  description: string; 
+  description?: string; 
   descriptionKey?: string; 
   status: ProjectStatus;
   focus: boolean; 
@@ -60,7 +60,7 @@ export interface Project {
 
 export interface Milestone {
   id: string;
-  title: string; 
+  title?: string; 
   titleKey?: string; 
   dueDate: string; 
   completed: boolean;
@@ -68,14 +68,14 @@ export interface Milestone {
 
 export interface ResourceLink {
   id: string;
-  title: string; 
+  title?: string; 
   titleKey?: string; 
   url: string;
 }
 
 export interface Goal {
   id: string;
-  title: string; 
+  title?: string; 
   titleKey?: string; 
   description?: string; 
   descriptionKey?: string; 
@@ -86,14 +86,14 @@ export interface Goal {
 
 export interface SubGoal {
   id: string;
-  title: string; 
+  title?: string; 
   titleKey?: string; 
   completed: boolean;
 }
 
 export interface Habit {
   id: string;
-  name: string; 
+  name?: string; 
   nameKey?: string; 
   frequency: 'daily' | 'weekly'; 
   lastCheckedIn?: string; 

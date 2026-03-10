@@ -17,21 +17,8 @@ import { useTranslation } from 'react-i18next';
 import { compareAsc, compareDesc, parseISO } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; 
 import { TaskCalendarView } from '@/components/todo/task-calendar-view'; 
-
-const getDummyTasks = (t: Function): Task[] => [
-  { id: '1', titleKey: "todo_dummy_task1_title", descriptionKey: "todo_dummy_task1_desc", status: 'todo', dueDate: new Date(2024, 7, 15).toISOString(), priority: 'high', tags: ['personal', 'health'] },
-  { id: '2', titleKey: "todo_dummy_task2_title", status: 'done', dueDate: new Date(2024, 7, 10).toISOString(), priority: 'medium', tags: ['home'] },
-  { id: '3', titleKey: "todo_dummy_task3_title", descriptionKey: "todo_dummy_task3_desc", status: 'in-progress', priority: 'medium', tags: ['travel', 'planning'], dueDate: new Date(2024, 7, 15).toISOString() },
-  { id: '4', titleKey: "todo_dummy_task4_title", descriptionKey: "todo_dummy_task4_desc", status: 'blocked', dueDate: new Date(2024, 8, 1).toISOString(), priority: 'low', tags: ['work', 'research'] },
-  { id: '5', title: "Design new dashboard", description: "Wireframes and mockups for v2", status: 'todo', dueDate: new Date(2024, 7, 20).toISOString(), priority: 'highest', tags: ['design', 'ux'] },
-  { id: '6', title: "Write API documentation", description: "For all public endpoints", status: 'in-progress', dueDate: new Date(2024, 8, 5).toISOString(), priority: 'high', tags: ['dev', 'docs'] },
-  { id: '7', title: "Review PR #123", status: 'in-review', priority: 'medium', tags: ['dev', 'code-review'], dueDate: new Date().toISOString() },
-  { id: '8', title: "Plan team building event", status: 'todo', priority: 'low', tags: ['hr', 'event'], dueDate: new Date(2024, 7, 22).toISOString() },
-  { id: '9', titleKey: "todo_dummy_task1_title", descriptionKey: "todo_dummy_task1_desc", status: 'todo', dueDate: new Date(2024, 7, 25).toISOString(), priority: 'high', tags: ['personal', 'urgent'] },
-  { id: '10', title: "Prepare presentation slides", status: 'in-progress', priority: 'highest', tags: ['work', 'meeting'], dueDate: new Date(2024, 7, 18).toISOString() },
-  { id: '11', title: "Book flight tickets", status: 'todo', dueDate: new Date(2024, 9, 1).toISOString(), priority: 'medium', tags: ['travel'] },
-  { id: '12', title: "Grocery Shopping", status: 'done', priority: 'low', tags: ['home', 'personal'], dueDate: new Date(2024, 7, 12).toISOString()},
-];
+import { loadTasks, saveTasks } from '@/lib/storage';
+import { getTaskStatusTranslationKey } from '@/lib/status-labels';
 
 const taskPriorityOptions: TaskPriority[] = ['lowest', 'low', 'medium', 'high', 'highest'];
 const taskStatusOptions: TaskStatus[] = ['todo', 'in-progress', 'blocked', 'in-review', 'done'];
@@ -40,12 +27,7 @@ type SortOrder = 'asc' | 'desc';
 
 export default function TodoPage() {
   const { t } = useTranslation('common');
-  const [tasks, setTasks] = useState<Task[]>(() => getDummyTasks(t).map(task => ({
-    ...task, 
-    title: task.titleKey ? t(task.titleKey) : task.title || '',
-    description: task.descriptionKey ? t(task.descriptionKey) : task.description,
-    completed: task.status === 'done'
-  })));
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [taskCompletedAnim, setTaskCompletedAnim] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null); 
@@ -59,6 +41,19 @@ export default function TodoPage() {
   
   const [sortBy, setSortBy] = useState<SortableTaskKeys>('dueDate');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [hasLoadedTasks, setHasLoadedTasks] = useState(false);
+
+  useEffect(() => {
+    setTasks(loadTasks());
+    setHasLoadedTasks(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedTasks) {
+      return;
+    }
+    saveTasks(tasks);
+  }, [hasLoadedTasks, tasks]);
 
 
   const handleAddTask = useCallback((newTaskData: Omit<Task, 'id' | 'completed' | 'projectId'>) => {
@@ -134,7 +129,7 @@ export default function TodoPage() {
           comparison = priorityOrderMap[a.priority] - priorityOrderMap[b.priority];
           break;
         case 'title':
-          comparison = a.title.localeCompare(b.title);
+          comparison = (a.title || '').localeCompare(b.title || '');
           break;
         case 'status':
           comparison = a.status.localeCompare(b.status); 
@@ -200,7 +195,7 @@ export default function TodoPage() {
                   <SelectContent>
                     <SelectItem value="all">{t('common_all_statuses')}</SelectItem>
                     {taskStatusOptions.map(opt => (
-                      <SelectItem key={opt} value={opt}>{t(`task_status_${opt.replace('-', '_')}`)}</SelectItem>
+                      <SelectItem key={opt} value={opt}>{t(getTaskStatusTranslationKey(opt))}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

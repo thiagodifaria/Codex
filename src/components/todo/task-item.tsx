@@ -10,6 +10,7 @@ import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
+import { getTaskStatusTranslationKey } from '@/lib/status-labels';
 
 interface TaskItemProps {
   task: Task;
@@ -148,7 +149,7 @@ export const TaskItem = React.memo(function TaskItem({
               )}
           >
             <StatusIcon className="h-3 w-3" />
-            {t(`task_status_${task.status.replace('-', '_')}`)}
+            {t(getTaskStatusTranslationKey(task.status))}
           </Badge>
         </div>
         {task.tags && task.tags.length > 0 && (

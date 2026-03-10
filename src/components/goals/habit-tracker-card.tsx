@@ -26,7 +26,11 @@ export function HabitTrackerCard({ habits, onToggleHabit, currentDate }: HabitTr
         {habits.length > 0 ? (
           <ul className="space-y-3">
             {habits.map(habit => {
-              const isCheckedForCurrentDate = habit.lastCheckedIn && isValidDate(parseISO(habit.lastCheckedIn)) && format(parseISO(habit.lastCheckedIn), 'yyyy-MM-dd') === currentDate;
+              const isCheckedForCurrentDate = Boolean(
+                habit.lastCheckedIn &&
+                isValidDate(parseISO(habit.lastCheckedIn)) &&
+                format(parseISO(habit.lastCheckedIn), 'yyyy-MM-dd') === currentDate
+              );
               
               return (
                 <li key={habit.id} className="flex items-center gap-3 p-3 border rounded-md hover:bg-muted/50 transition-colors">

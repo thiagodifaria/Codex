@@ -11,6 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; 
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation, Trans } from 'react-i18next';
+import { DEMO_CREDENTIALS, getDemoSession, setDemoSession } from '@/lib/demo-auth';
+import { useEffect } from 'react';
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 48 48" width="20px" height="20px" className="mr-2">
@@ -28,16 +30,20 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
-
-  const MOCK_EMAIL = "teste@email.com";
-  const MOCK_PASSWORD = "senha@teste123";
+  
+  useEffect(() => {
+    if (getDemoSession()) {
+      router.replace('/dashboard');
+    }
+  }, [router]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === MOCK_EMAIL && password === MOCK_PASSWORD) {
+    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
+      setDemoSession('password');
       toast({
         title: "Login Successful",
-        description: "Welcome back!",
+        description: `Logged in as ${DEMO_CREDENTIALS.displayName}.`,
       });
       router.push('/dashboard'); 
     } else if (email && password) {
@@ -56,12 +62,12 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    console.log('Continue with Google clicked');
+    setDemoSession('google');
     toast({
         title: "Login with Google",
-        description: "Redirecting to Google for authentication...",
+        description: `Connected as ${DEMO_CREDENTIALS.displayName}.`,
       });
-    setTimeout(() => router.push('/dashboard'), 1000);
+    router.push('/dashboard');
   };
 
   return (
@@ -110,7 +116,7 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password..."
+                placeholder="test123"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

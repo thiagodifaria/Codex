@@ -8,15 +8,26 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { UserCircle, AtSign } from "lucide-react";
 import { useTranslation } from 'react-i18next';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { DEMO_CREDENTIALS, getDemoSession } from "@/lib/demo-auth";
 
 export default function ProfilePage() {
   const { t } = useTranslation('common');
-  const username = "test_user#1234"; 
-  const [displayName, setDisplayName] = useState(t('profile_default_display_name'));
-  const [bio, setBio] = useState(t('profile_default_bio'));
-  
-  const email = "user@example.com";
+  const [displayName, setDisplayName] = useState<string>(DEMO_CREDENTIALS.displayName);
+  const [bio, setBio] = useState<string>("");
+  const [username, setUsername] = useState<string>(DEMO_CREDENTIALS.username);
+  const [email, setEmail] = useState<string>(DEMO_CREDENTIALS.email);
+
+  useEffect(() => {
+    const session = getDemoSession();
+    if (!session) {
+      return;
+    }
+
+    setDisplayName(session.displayName);
+    setUsername(session.username);
+    setEmail(session.email);
+  }, []);
 
   return (
     <PageWrapper title={t('page_title_profile')}>
@@ -30,7 +41,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-4">
             <Avatar className="w-32 h-32">
-              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarImage src="" />
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <Button variant="outline" size="sm">{t('profile_change_avatar_button')}</Button>
@@ -58,7 +69,7 @@ export default function ProfilePage() {
                 id="displayName" 
                 value={displayName} 
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder={t('profile_default_display_name')} 
+                placeholder={DEMO_CREDENTIALS.displayName} 
               />
             </div>
             <div className="space-y-2">

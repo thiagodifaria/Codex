@@ -18,6 +18,7 @@ interface EntryCardProps {
 
 export const EntryCard = React.memo(function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
   const { t } = useTranslation('common');
+  const previewContent = (entry.content || '').replace(/<[^>]+>/g, '');
   return (
     <Card data-testid={`journal-entry-${entry.id}`} className="shadow-md hover:shadow-lg transition-shadow duration-200">
       <CardHeader>
@@ -25,7 +26,7 @@ export const EntryCard = React.memo(function EntryCard({ entry, onEdit, onDelete
         <CardDescription>{isValid(parseISO(entry.date)) ? format(parseISO(entry.date), 'PPP') : t('common_invalid_date')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm line-clamp-3">{entry.content.replace(/<[^>]+>/g, '').substring(0, 150) + (entry.content.replace(/<[^>]+>/g, '').length > 150 ? "..." : "")}</p>
+        <p className="text-sm line-clamp-3">{previewContent.substring(0, 150) + (previewContent.length > 150 ? "..." : "")}</p>
         {entry.tags && entry.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
             {entry.tags.map(tag => (

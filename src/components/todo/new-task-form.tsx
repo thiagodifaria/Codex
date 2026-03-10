@@ -14,6 +14,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import type { Task, TaskPriority, TaskStatus } from '@/types/codex';
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { useTranslation } from 'react-i18next';
+import { getTaskStatusTranslationKey } from '@/lib/status-labels';
 
 interface NewTaskFormProps {
   onAddTask: (task: Omit<Task, 'id' | 'completed' | 'projectId'>) => void;
@@ -149,7 +150,7 @@ export function NewTaskForm({ onAddTask, isOpen, onToggle, formTitle }: NewTaskF
                 </SelectTrigger>
                 <SelectContent>
                   {taskStatusOptions.map(opt => (
-                    <SelectItem key={opt} value={opt}>{t(`task_status_${opt.replace('-', '_')}`)}</SelectItem>
+                    <SelectItem key={opt} value={opt}>{t(getTaskStatusTranslationKey(opt))}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

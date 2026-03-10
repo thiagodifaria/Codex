@@ -18,14 +18,34 @@ import { UserCircle, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { clearDemoSession, getDemoSession } from '@/lib/demo-auth';
+import { useEffect, useState } from 'react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { t } = useTranslation('common');
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [displayName, setDisplayName] = useState('');
+
+  useEffect(() => {
+    const session = getDemoSession();
+    if (!session) {
+      router.replace('/login');
+      return;
+    }
+
+    setDisplayName(session.displayName);
+    setIsCheckingSession(false);
+  }, [router]);
 
   const handleLogout = () => {
+    clearDemoSession();
     router.push('/login');
   };
+
+  if (isCheckingSession) {
+    return null;
+  }
 
   return (
     <SidebarProvider defaultOpen>
@@ -41,6 +61,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarContent>
         <SidebarFooter className="p-2 mt-auto">
           <Separator className="my-2" />
+          <div className="px-3 py-2 text-sm text-muted-foreground group-data-[collapsible=icon]:hidden">
+            {displayName}
+          </div>
           <Link href="/profile" passHref legacyBehavior>
             <Button asChild variant="ghost" className="w-full justify-start group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:aspect-square">
               <a>

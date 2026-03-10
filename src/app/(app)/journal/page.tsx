@@ -15,21 +15,12 @@ import { Card } from "@/components/ui/card";
 import { useTranslation } from 'react-i18next';
 import { TiptapEditor } from '@/components/shared/tiptap-editor';
 import { Label } from "@/components/ui/label";
-
-const getDummyEntries = (t: Function): JournalEntry[] => [
-  { id: '1', date: new Date(2024, 6, 20).toISOString(), titleKey: "journal_dummy_entry1_title", contentKey: "journal_dummy_entry1_content", tags: ["productivity", "reflection"] },
-  { id: '2', date: new Date(2024, 6, 21).toISOString(), titleKey: "journal_dummy_entry2_title", contentKey: "journal_dummy_entry2_content", tags: ["personal", "weekend"] },
-  { id: '3', date: new Date().toISOString(), titleKey: "journal_dummy_entry3_title", contentKey: "journal_dummy_entry3_content", tags: ["work", "design"] },
-];
+import { loadJournalEntries, saveJournalEntries } from '@/lib/storage';
 
 export default function JournalPage() {
   const { t } = useTranslation('common');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [entries, setEntries] = useState<JournalEntry[]>(() => getDummyEntries(t).map(e => ({
-    ...e,
-    title: e.titleKey ? t(e.titleKey) : e.title || '',
-    content: e.contentKey ? t(e.contentKey) : e.content || ''
-  })));
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
   
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [currentEntry, setCurrentEntry] = useState<Partial<JournalEntry> | null>(null);
@@ -37,6 +28,19 @@ export default function JournalPage() {
   const [entryContent, setEntryContent] = useState("");
   const [entryTagsString, setEntryTagsString] = useState("");
   const [tagFilter, setTagFilter] = useState('');
+  const [hasLoadedEntries, setHasLoadedEntries] = useState(false);
+
+  useEffect(() => {
+    setEntries(loadJournalEntries());
+    setHasLoadedEntries(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedEntries) {
+      return;
+    }
+    saveJournalEntries(entries);
+  }, [entries, hasLoadedEntries]);
 
   const filteredEntriesByDate = useMemo(() => {
     if (selectedDate) {
@@ -71,8 +75,8 @@ export default function JournalPage() {
 
   const handleEditEntry = useCallback((entry: JournalEntry) => {
     setCurrentEntry(entry);
-    setEntryTitle(entry.title);
-    setEntryContent(entry.content);
+    setEntryTitle(entry.title || "");
+    setEntryContent(entry.content || "");
     setEntryTagsString(entry.tags?.join(', ') || "");
     setIsFormVisible(true);
   }, []);

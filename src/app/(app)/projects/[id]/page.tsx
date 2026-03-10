@@ -28,6 +28,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
+import { loadProjects, loadTasks, saveProjects, saveTasks } from '@/lib/storage';
+import { getProjectStatusTranslationKey, getTaskStatusTranslationKey } from '@/lib/status-labels';
 
 
 const projectStatusColors: Record<ProjectStatus, string> = {
@@ -38,45 +40,6 @@ const projectStatusColors: Record<ProjectStatus, string> = {
   archived: "bg-gray-100 text-gray-700 dark:bg-gray-700/30 dark:text-gray-300",
 };
 const projectStatusOptions: ProjectStatus[] = ['planning', 'active', 'on-hold', 'completed', 'archived'];
-
-
-const getDummyProjectsData = (t: Function): Project[] => [
-  { 
-    id: 'codex-app', nameKey: "projects_dummy_proj1_name", 
-    descriptionKey: "projects_dummy_proj1_desc", 
-    status: 'active', focus: true, 
-    startDate: new Date(2024, 5, 1).toISOString(), endDate: new Date(2024, 11, 31).toISOString(),
-    tags: ["dev", "productivity", "saas"],
-    milestones: [
-      { id: 'm1', titleKey: "projects_dummy_proj1_milestone1_title", dueDate: "2024-09-01", completed: false },
-      { id: 'm2', titleKey: "projects_dummy_proj1_milestone2_title", dueDate: "2024-10-15", completed: false },
-    ],
-    resources: [
-      { id: 'r1', titleKey: "projects_dummy_proj1_resource1_title", url: "https:
-      { id: 'r2', titleKey: "projects_dummy_proj1_resource2_title", url: "https:
-    ]
-  },
-  { 
-    id: 'personal-website', nameKey: "projects_dummy_proj2_name", 
-    descriptionKey: "projects_dummy_proj2_desc", 
-    status: 'planning', focus: false, 
-    startDate: new Date(2024, 8, 1).toISOString(), 
-    tags: ["web", "portfolio"],
-    milestones: [], resources: [] 
-  },
-];
-
-const getDummyTasksData = (t: Function): { [projectId: string]: Task[] } => ({
-  'codex-app': [
-    { id: 't1', projectId: 'codex-app', titleKey: "projects_task_proj1_task1_title", completed: true, status: 'done', priority: 'high', descriptionKey: "projects_task_proj1_task1_desc", tags: ["setup", "config"] },
-    { id: 't2', projectId: 'codex-app', titleKey: "projects_task_proj1_task2_title", completed: false, status: 'in-progress', dueDate: "2024-08-10", priority: 'high', descriptionKey: "projects_task_proj1_task2_desc", tags: ["backend", "database"] },
-    { id: 't3', projectId: 'codex-app', titleKey: "projects_task_proj1_task3_title", completed: false, status: 'todo', priority: 'medium', descriptionKey: "projects_task_proj1_task3_desc", tags: ["auth", "security"] },
-  ],
-  'personal-website': [
-    { id: 't4', projectId: 'personal-website', titleKey: "projects_task_proj2_task1_title", completed: true, status: 'done', priority: 'medium', descriptionKey: "projects_task_proj2_task1_desc", tags: ["design", "ui"] },
-    { id: 't5', projectId: 'personal-website', titleKey: "projects_task_proj2_task2_title", completed: false, status: 'todo', priority: 'low', descriptionKey: "projects_task_proj2_task2_desc", tags: ["content", "writing"] },
-  ]
-});
 
 const taskStatusOrder: TaskStatus[] = ['todo', 'in-progress', 'in-review', 'blocked', 'done'];
 
@@ -112,6 +75,7 @@ export default function ProjectDetailPage() {
   const [editingProjectEndDate, setEditingProjectEndDate] = useState<Date | undefined>();
   const [editingProjectFocus, setEditingProjectFocus] = useState(false);
   const [editingProjectTagsString, setEditingProjectTagsString] = useState("");
+  const [hasLoadedProjectData, setHasLoadedProjectData] = useState(false);
   
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
@@ -121,47 +85,52 @@ export default function ProjectDetailPage() {
 
   useEffect(() => {
     if (projectId) {
-      const dummyProjectsData = getDummyProjectsData(t);
-      const dummyTasksData = getDummyTasksData(t);
-
       setTimeout(() => {
-        const foundProject = dummyProjectsData.find(p => p.id === projectId);
-        if (foundProject) {
-          const translatedProject = {
-            ...foundProject,
-            name: foundProject.nameKey ? t(foundProject.nameKey) : foundProject.name || '',
-            description: foundProject.descriptionKey ? t(foundProject.descriptionKey) : foundProject.description || '',
-            milestones: (foundProject.milestones || []).map(m => ({...m, title: m.titleKey ? t(m.titleKey): m.title || ''})),
-            resources: (foundProject.resources || []).map(r => ({...r, title: r.titleKey ? t(r.titleKey) : r.title || ''}))
-          };
-          setProject(translatedProject);
-          setTasks((dummyTasksData[projectId] || []).map(task => ({
-            ...task, 
-            title: task.titleKey ? t(task.titleKey) : task.title || '',
-            description: task.descriptionKey ? t(task.descriptionKey) : task.description,
-            tags: task.tags || [],
-            completed: task.status === 'done'
-          })));
-          setProjectNotes(localStorage.getItem(`project_notes_${projectId}`) || `<p>${t('project_detail_notes_placeholder', { projectName: translatedProject.name })}</p>`);
-        
-          setEditingProjectName(translatedProject.name);
-          setEditingProjectDescription(translatedProject.description);
-          setEditingProjectStatus(translatedProject.status);
-          setEditingProjectFocus(translatedProject.focus);
-          setEditingProjectStartDate(translatedProject.startDate ? parseISO(translatedProject.startDate) : undefined);
-          setEditingProjectEndDate(translatedProject.endDate ? parseISO(translatedProject.endDate) : undefined);
-          setEditingProjectTagsString(translatedProject.tags?.join(', ') || "");
+        const storedProjects = loadProjects();
+        const storedTasks = loadTasks();
+        const foundProject = storedProjects.find((storedProject) => storedProject.id === projectId) || null;
 
+        setProject(foundProject);
+        setTasks(storedTasks.filter((task) => task.projectId === projectId));
+        setProjectNotes(localStorage.getItem(`project_notes_${projectId}`) || (foundProject ? `<p>${t('project_detail_notes_placeholder', { projectName: foundProject.name })}</p>` : "<p></p>"));
+
+        if (foundProject) {
+          setEditingProjectName(foundProject.name || "");
+          setEditingProjectDescription(foundProject.description || "");
+          setEditingProjectStatus(foundProject.status);
+          setEditingProjectFocus(foundProject.focus);
+          setEditingProjectStartDate(foundProject.startDate ? parseISO(foundProject.startDate) : undefined);
+          setEditingProjectEndDate(foundProject.endDate ? parseISO(foundProject.endDate) : undefined);
+          setEditingProjectTagsString(foundProject.tags?.join(', ') || "");
         }
+        setHasLoadedProjectData(true);
         setIsLoading(false);
       }, 500);
     }
   }, [projectId, t]);
 
+  useEffect(() => {
+    if (!project) {
+      return;
+    }
+
+    const projects = loadProjects();
+    saveProjects(projects.map((storedProject) => storedProject.id === project.id ? project : storedProject));
+  }, [project]);
+
+  useEffect(() => {
+    if (!hasLoadedProjectData) {
+      return;
+    }
+
+    const allTasks = loadTasks().filter((task) => task.projectId !== projectId);
+    saveTasks([...allTasks, ...tasks]);
+  }, [hasLoadedProjectData, projectId, tasks]);
+
   const openEditProjectModal = useCallback(() => {
     if (project) {
-      setEditingProjectName(project.name);
-      setEditingProjectDescription(project.description);
+      setEditingProjectName(project.name || "");
+      setEditingProjectDescription(project.description || "");
       setEditingProjectStatus(project.status);
       setEditingProjectFocus(project.focus);
       setEditingProjectStartDate(project.startDate && isValid(parseISO(project.startDate)) ? parseISO(project.startDate) : undefined);
@@ -259,8 +228,8 @@ export default function ProjectDetailPage() {
       return;
     }
     try {
-      if (!newResourceUrl.startsWith('http:
-          throw new Error("Invalid URL");
+      if (!newResourceUrl.startsWith('http://') && !newResourceUrl.startsWith('https://')) {
+        throw new Error("Invalid URL");
       }
       new URL(newResourceUrl);
     } catch (_) {
@@ -410,7 +379,7 @@ export default function ProjectDetailPage() {
         <CardContent className="pt-2">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-3">
             <Badge className={cn("text-xs font-semibold px-2.5 py-1 rounded-full border-transparent", projectStatusColors[project.status])}>
-              {t(`project_status_${project.status.replace('-', '_')}`)}
+              {t(getProjectStatusTranslationKey(project.status))}
             </Badge>
             {project.focus && (
               <Badge variant="outline" className="text-xs border-primary text-primary flex items-center gap-1">
@@ -501,7 +470,7 @@ export default function ProjectDetailPage() {
                                 )}
                               >
                                 <div className="flex justify-between items-center mb-3">
-                                  <h3 className="font-semibold text-md capitalize">{t(`task_status_${status.replace('-', '_')}`)}</h3>
+                                  <h3 className="font-semibold text-md capitalize">{t(getTaskStatusTranslationKey(status))}</h3>
                                   <Badge variant="secondary" className="text-xs">{tasksInGroup.length}</Badge>
                                 </div>
                                 <div className="space-y-3 min-h-[50px] max-h-[calc(100vh-380px)] overflow-y-auto pr-1">
@@ -540,7 +509,7 @@ export default function ProjectDetailPage() {
                       return (
                         <div key={status} className="p-3 bg-muted/50 rounded-lg w-64 sm:w-72 lg:w-80 flex-shrink-0">
                           <div className="flex justify-between items-center mb-3">
-                            <h3 className="font-semibold text-md capitalize">{t(`task_status_${status.replace('-', '_')}`)}</h3>
+                            <h3 className="font-semibold text-md capitalize">{t(getTaskStatusTranslationKey(status))}</h3>
                             <Badge variant="secondary" className="text-xs">{tasksInGroup.length}</Badge>
                           </div>
                           <div className="space-y-3 min-h-[50px] max-h-[calc(100vh-380px)] overflow-y-auto pr-1"> 
@@ -670,7 +639,7 @@ export default function ProjectDetailPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {projectStatusOptions.map(option => (
-                    <SelectItem key={option} value={option}>{t(`project_status_${option.replace('-', '_')}`)}</SelectItem>
+                    <SelectItem key={option} value={option}>{t(getProjectStatusTranslationKey(option))}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -772,4 +741,3 @@ export default function ProjectDetailPage() {
     </PageWrapper>
   );
 }
-

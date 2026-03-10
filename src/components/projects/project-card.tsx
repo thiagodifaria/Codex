@@ -11,6 +11,7 @@ import { format, parseISO, isValid } from 'date-fns';
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import React from 'react';
+import { getProjectStatusTranslationKey } from '@/lib/status-labels';
 
 interface ProjectCardProps {
   project: Project;
@@ -39,7 +40,7 @@ export const ProjectCard = React.memo(function ProjectCard({ project, onEdit }: 
       <CardContent className="flex-grow space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant="secondary" className={cn("border-transparent",statusColors[project.status])}>
-            {t(`project_status_${project.status.replace('-', '_')}`)}
+            {t(getProjectStatusTranslationKey(project.status))}
           </Badge>
           {project.focus && <Badge variant="outline" className="border-primary text-primary">{t('project_in_focus_badge')}</Badge>}
         </div>

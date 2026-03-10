@@ -59,6 +59,7 @@ export default function SignupPage() {
   const { t } = useTranslation('common');
   const router = useRouter();
   const { toast } = useToast();
+  const appName = t('appName');
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupFormSchema),
@@ -98,13 +99,13 @@ export default function SignupPage() {
     <>
       <div className="absolute top-6 left-6 sm:top-8 sm:left-8 flex items-center gap-2">
         <Logo size={28} />
-        <span className="text-xl font-semibold">{t('appName')}</span>
+        <span className="text-xl font-semibold">{appName}</span>
       </div>
       <Card className="w-full max-w-lg shadow-xl my-8">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold">{t('signup_title')}</CardTitle>
           <CardDescription>
-            <Trans i18nKey="signup_description" ns="common" values={{ appName: t('appName') }}>
+            <Trans i18nKey="signup_description" ns="common" values={{ appName }}>
               Join {{appName}} today! Fill in your details below.
             </Trans>
           </CardDescription>

@@ -14,46 +14,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from '@/components/ui/label';
 import { format, isValid, parseISO } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-
-export const getDummyGoals = (t: Function): Goal[] => [
-  { id: '1', titleKey: "goals_dummy_goal1_title", descriptionKey: "goals_dummy_goal1_desc", targetDate: new Date(2024, 11, 31).toISOString(), progress: 0, subGoals: [
-    {id: 'sg1', titleKey: "goals_dummy_goal1_sg1", completed: false},
-    {id: 'sg2', titleKey: "goals_dummy_goal1_sg2", completed: false},
-  ]},
-  { id: '2', titleKey: "goals_dummy_goal2_title", descriptionKey: "goals_dummy_goal2_desc", targetDate: new Date(2024, 9, 15).toISOString(), progress: 0, subGoals: [
-    {id: 'sg3', titleKey: "goals_dummy_goal2_sg1", completed: false},
-    {id: 'sg4', titleKey: "goals_dummy_goal2_sg2", completed: false},
-    {id: 'sg5', titleKey: "goals_dummy_goal2_sg3", completed: false},
-  ]},
-  { id: '3', titleKey: "goals_dummy_goal3_title", descriptionKey: "goals_dummy_goal3_desc", progress: 75 }, 
-];
-
-const getDummyHabits = (t: Function): Habit[] => [
-  { id: 'h1', nameKey: "goals_dummy_habit1_name", frequency: 'daily', lastCheckedIn: new Date(Date.now() - 86400000).toISOString() }, 
-  { id: 'h2', nameKey: "goals_dummy_habit2_name", frequency: 'daily' },
-  { id: 'h3', nameKey: "goals_dummy_habit3_name", frequency: 'daily', lastCheckedIn: new Date().toISOString() }, 
-  { id: 'h4', nameKey: "goals_dummy_habit4_name", frequency: 'weekly' },
-];
-
-export const calculateProgress = (subGoals?: SubGoal[]): number => {
-  if (!subGoals || subGoals.length === 0) {
-    return 0; 
-  }
-  const completedCount = subGoals.filter(sg => sg.completed).length;
-  return Math.round((completedCount / subGoals.length) * 100);
-};
+import { calculateProgress, getDummyGoals, getDummyHabits } from '@/lib/goals';
+import { loadGoals, loadHabits, saveGoals, saveHabits } from '@/lib/storage';
 
 
 export default function GoalsPage() {
   const { t } = useTranslation('common');
-  const [goals, setGoals] = useState<Goal[]>(() => getDummyGoals(t).map(g => ({
+  const [goals, setGoals] = useState<Goal[]>(() => getDummyGoals().map(g => ({
       ...g, 
       title: g.titleKey ? t(g.titleKey) : g.title || '',
       description: g.descriptionKey ? t(g.descriptionKey) : g.description,
       subGoals: g.subGoals?.map(sg => ({...sg, title: sg.titleKey ? t(sg.titleKey) : sg.title || ''})),
       progress: calculateProgress(g.subGoals) || g.progress || 0
     })));
-  const [habits, setHabits] = useState<Habit[]>(() => getDummyHabits(t).map(h => ({
+  const [habits, setHabits] = useState<Habit[]>(() => getDummyHabits().map(h => ({
       ...h,
       name: h.nameKey ? t(h.nameKey) : h.name || ''
   })));
@@ -70,6 +44,27 @@ export default function GoalsPage() {
 
   const [habitName, setHabitName] = useState("");
   const [habitFrequency, setHabitFrequency] = useState<'daily' | 'weekly'>('daily');
+  const [hasLoadedGoalData, setHasLoadedGoalData] = useState(false);
+
+  useEffect(() => {
+    setGoals(loadGoals());
+    setHabits(loadHabits());
+    setHasLoadedGoalData(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedGoalData) {
+      return;
+    }
+    saveGoals(goals);
+  }, [goals, hasLoadedGoalData]);
+
+  useEffect(() => {
+    if (!hasLoadedGoalData) {
+      return;
+    }
+    saveHabits(habits);
+  }, [habits, hasLoadedGoalData]);
 
   const openNewGoalModal = useCallback(() => {
     setCurrentGoalId(null); 
@@ -85,7 +80,7 @@ export default function GoalsPage() {
     const goalToEdit = goals.find(g => g.id === goalId);
     if (goalToEdit) {
       setCurrentGoalId(goalToEdit.id);
-      setGoalTitle(goalToEdit.title);
+      setGoalTitle(goalToEdit.title || "");
       setGoalDescription(goalToEdit.description || "");
       setGoalTargetDate(goalToEdit.targetDate && isValid(parseISO(goalToEdit.targetDate)) ? format(parseISO(goalToEdit.targetDate), 'yyyy-MM-dd') : "");
       setSubGoals(goalToEdit.subGoals ? [...goalToEdit.subGoals] : []);

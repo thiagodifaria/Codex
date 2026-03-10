@@ -40,9 +40,11 @@ export function TaskCalendarView({ tasks, initialSelectedDate = new Date() }: Ta
     return tasksByDate[dateKey] || [];
   }, [selectedDay, tasksByDate]);
 
-  const modifiers = {
-    selected: selectedDay ? (date: Date) => isSameDay(date, selectedDay) : undefined,
-  };
+  const modifiers = selectedDay
+    ? {
+        selected: (date: Date) => isSameDay(date, selectedDay),
+      }
+    : undefined;
 
   const modifiersClassNames = {
     selected: 'day-selected', 
